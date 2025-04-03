@@ -46,7 +46,6 @@ class ClienteController extends Controller
 
         // Crea el Cliente en la base de datos local.
         $user = User::create([
-            'name'     => $data['nombre'] . ' ' . $data['apellidos'],
             'email'    => $data['email'],
             'password' => Hash::make($passwordTemporal), // Guarda la contraseña encriptada
             'rol'      => 'cliente',
