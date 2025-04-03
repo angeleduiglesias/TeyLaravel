@@ -3,6 +3,9 @@
 namespace App\Http\Requests\Notario;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Auth;
+
 
 class StoreNotarioRequest extends FormRequest
 {
@@ -14,7 +17,7 @@ class StoreNotarioRequest extends FormRequest
     public function authorize(): bool
     {
         // Verificamos si el usuario está autenticado y si su rol es "admin".
-        if (auth()->check() && auth()->user()->rol === 'admin') {
+        if (Auth::check() && Auth::user()->rol === 'admin') {
             return true;
         }
 

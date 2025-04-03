@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests\Cliente;
+namespace App\Http\Requests\Notario;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreClienteRequest extends FormRequest
+class DestroyNotarioRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -22,10 +22,7 @@ class StoreClienteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre'  => 'required|string|max:255',
-            'apellidos'  => 'required|string|max:255',
-            'telefono' => 'required|digits:9',
-            'email'    => 'required|email|unique:users,email',
+            //
         ];
     }
 }

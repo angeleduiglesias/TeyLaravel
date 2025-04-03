@@ -7,6 +7,7 @@ use App\Http\Requests\Cliente\StoreClienteRequest;
 use App\Http\Requests\Cliente\IndexClienteRequest;
 use App\Http\Requests\Cliente\UpdateClienteRequest;
 use App\Http\Requests\Cliente\DestroyClienteRequest;
+use App\Http\Requests\Cliente\ShowClienteRequest;
 use Illuminate\Http\JsonResponse;
 use App\Services\FirebaseAuthService;
 use App\Models\User;
@@ -45,7 +46,7 @@ class ClienteController extends Controller
 
         // Crea el Cliente en la base de datos local.
         $user = User::create([
-            'full_name'     => $data['full_name'],
+            'name'     => $data['nombre'] . ' ' . $data['apellidos'],
             'email'    => $data['email'],
             'password' => Hash::make($passwordTemporal), // Guarda la contraseña encriptada
             'rol'      => 'cliente',
@@ -54,7 +55,8 @@ class ClienteController extends Controller
         // Crea el los datos adicionales del Cliente en la tabla cliente.
         $cliente = Cliente::create([
             'dni'      => $data['dni'],
-            'full_name' => $data['full_name'],
+            'nombre' => $data['nombre'],
+            'apellidos' => $data['apellidos'],
             'telefono'  => $data['telefono'],
             'user_id'   => $user->id,
         ]);
@@ -102,7 +104,7 @@ class ClienteController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(DestroyClienteRequest $request, string $id): JsonResponse
+    public function destroy(DestroyClienteRequest $request, string $id, FirebaseAuthService $firebaseAuth): JsonResponse
     {
         //Buscamos al cliente por su ID
         $cliente = Cliente::find($id);  
@@ -113,11 +115,11 @@ class ClienteController extends Controller
         }
 
         // Elimina el cliente de Firebase y de la tabla Clientes.
-        try {
-            $firebaseAuth->deleteUser($cliente->user->email);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 422);
-        }
+        // try {
+        //     $firebaseAuth->deleteUser($cliente->user->email);
+        // } catch (\Exception $e) {
+        //     return response()->json(['error' => $e->getMessage()], 422);
+        // }
 
         // Elimina el cliente de la base de datos local.
         $cliente->delete();
