@@ -7,6 +7,7 @@ use App\Http\Requests\Cliente\StoreClienteRequest;
 use App\Http\Requests\Cliente\IndexClienteRequest;
 use App\Http\Requests\Cliente\UpdateClienteRequest;
 use App\Http\Requests\Cliente\DestroyClienteRequest;
+use App\Http\Requests\Cliente\ShowClienteRequest;
 use Illuminate\Http\JsonResponse;
 use App\Services\FirebaseAuthService;
 use App\Models\User;
@@ -101,7 +102,7 @@ class ClienteController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(DestroyClienteRequest $request, string $id): JsonResponse
+    public function destroy(DestroyClienteRequest $request, string $id, FirebaseAuthService $firebaseAuth): JsonResponse
     {
         //Buscamos al cliente por su ID
         $cliente = Cliente::find($id);  
@@ -112,11 +113,11 @@ class ClienteController extends Controller
         }
 
         // Elimina el cliente de Firebase y de la tabla Clientes.
-        try {
-            $firebaseAuth->deleteUser($cliente->user->email);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 422);
-        }
+        // try {
+        //     $firebaseAuth->deleteUser($cliente->user->email);
+        // } catch (\Exception $e) {
+        //     return response()->json(['error' => $e->getMessage()], 422);
+        // }
 
         // Elimina el cliente de la base de datos local.
         $cliente->delete();

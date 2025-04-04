@@ -12,7 +12,7 @@ class Tramite extends Model
         'estado',
         'cliente_id',
         'fecha_inicio',
-        'fecha_termino',
+        'fecha_fin',
     ];
 
     public function Cliente(): HasOne
