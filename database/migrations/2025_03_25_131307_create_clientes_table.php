@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('clientes', function (Blueprint $table) {
             $table->id();
-            $table->string('dni', 8)->unique();
-            $table->string('full_name', 255);
+            $table->string('nombre', 255);
+            $table->string('apellidos', 255);
             $table->string('telefono', 9);
+            // agregar estado
+            $table->enum('estado', ['activo', 'inactivo'])->default('inactivo');
             $table->unsignedBigInteger('user_id')->unique();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

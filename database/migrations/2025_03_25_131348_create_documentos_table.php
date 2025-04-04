@@ -16,6 +16,7 @@ return new class extends Migration
             $table->enum('estado', ['pendiente', 'aprobado', 'rechazado'])->default('pendiente');
             $table->string('observaciones')->default('Sin Observaciones');
             $table->enum('tipo_documento', ['reserva_nombre', 'minuta']);
+            
             $table->unsignedBigInteger('tramite_id');
             $table->foreign('tramite_id')->references('id')->on('tramites');
             $table->unsignedBigInteger('notario_id');

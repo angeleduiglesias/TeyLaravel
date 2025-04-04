@@ -7,10 +7,10 @@ use App\Http\Controllers\ClienteController;
 
 // Route::post('/cliente/store', [ClienteController::class, 'store']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/cliente/store', [ClienteController::class, 'store']);
 
 // Rutas protegidas por autenticación.
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Aquí van las rutas protegidas.
 });
