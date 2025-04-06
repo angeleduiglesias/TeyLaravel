@@ -5,19 +5,64 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\TramiteController;
+use App\Http\Controllers\DocumentoController;
+use App\Http\Controllers\NotarioController;
+use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\UserController;
 
-// Route::post('/cliente/store', [ClienteController::class, 'store']);
+
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/cliente/store', [ClienteController::class, 'store']);
 
 // Ruta para registrar un nuevo cliente.
 Route::post('/cliente/store', [ClienteController::class, 'store']);
 
-// Ruta para registrar un tramite.
-Route::post('/tramite/store', [TramiteController::class, 'store']);
+
 
 // Rutas protegidas por autenticación.
 Route::middleware(['auth:sanctum'])->group(function () {
+
+    // Rutas protegidas para el trámite.
+    Route::get('/tramite', [TramiteController::class, 'index']);
+    Route::post('/tramite/store', [TramiteController::class, 'store']);
+    Route::get('/tramite/{id}', [TramiteController::class, 'show']);
+    Route::put('/tramite/{id}', [TramiteController::class, 'update']);
+    Route::delete('/tramite/{id}', [TramiteController::class, 'destroy']);
+   
+
+    // Rutas protegidas para el cliente.
+    Route::get('/cliente', [ClienteController::class, 'index']);
+    Route::get('/cliente/{id}', [ClienteController::class, 'show']);
+    Route::put('/cliente/{id}', [ClienteController::class, 'update']);
+    Route::delete('/cliente/{id}', [ClienteController::class, 'destroy']);
+
+    // Rutas protegidas para el documento.
+    Route::get('/documento', [DocumentoController::class, 'index']);
+    Route::get('/documento/{id}', [DocumentoController::class, 'show']);
+    Route::put('/documento/{id}', [DocumentoController::class, 'update']);
+    Route::delete('/documento/{id}', [DocumentoController::class, 'destroy']);
+    Route::post('/documento/store', [DocumentoController::class, 'store']);
+
+    // Rutas protegidas para el notario.
+    Route::get('/notario', [NotarioController::class, 'index']);
+    Route::get('/notario/{id}', [NotarioController::class, 'show']);
+    Route::put('/notario/{id}', [NotarioController::class, 'update']);
+    Route::delete('/notario/{id}', [NotarioController::class, 'destroy']);
+    Route::post('/notario/store', [NotarioController::class, 'store']);
+
+    // Rutas protegidas para la empresa.
+    Route::get('/empresa', [EmpresaController::class, 'index']);
+    Route::get('/empresa/{id}', [EmpresaController::class, 'show']);        
+    Route::put('/empresa/{id}', [EmpresaController::class, 'update']);
+    Route::delete('/empresa/{id}', [EmpresaController::class, 'destroy']);
+    Route::post('/empresa/store', [EmpresaController::class, 'store']);
+
+    // Rutas protegidas para el admin.
+    Route::get('/admin/dashboard', [AdminController::class, 'index']);
+
+    // Rutas protegidas para el usuario.
+    Route::get('/user', [UserController::class, 'index']);
+
+    // Ruta para cerrar sesión.
     Route::post('/logout', [AuthController::class, 'logout']);
 
 });

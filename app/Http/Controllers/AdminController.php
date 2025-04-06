@@ -11,7 +11,20 @@ class AdminController extends Controller
      */
     public function index()
     {
-        //
+        $users = User::all();
+        $clientes = Cliente::all();
+        $tramites = Tramite::all();
+        $documentos = Documento::all();
+        $notarios = Notario::all();
+        $empresas = Empresa::all();
+        return response()->json([
+            'users' => $users,
+            'clientes' => $clientes,
+            'tramites' => $tramites,
+            'documentos' => $documentos,
+            'notarios' => $notarios,
+            'empresas' => $empresas
+        ]);
     }
 
     /**

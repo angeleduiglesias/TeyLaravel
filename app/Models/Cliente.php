@@ -26,4 +26,10 @@ class Cliente extends Model
         // Indicamos que un Cliente pertenece a un User
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function empresa(): BelongsTo
+    {
+        // Indicamos que un Cliente pertenece a una Empresa
+        return $this->belongsTo(Empresa::class, 'cliente_id');
+    }
 }
