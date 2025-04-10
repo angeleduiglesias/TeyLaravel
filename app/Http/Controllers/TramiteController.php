@@ -47,9 +47,16 @@ class TramiteController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(ShowTramiteRequest $request, string $id)
     {
-        //
+        // Mostramos el tramite asociado al clientes por su id
+        $tramite = Tramite::where('id', $id)
+            ->where('cliente_id', Auth::user()->cliente->id)
+            ->first();
+        if (!$tramite) {
+            return response()->json(['error' => 'Trámite no encontrado'], 404);
+        }
+        return response()->json($tramite, 200);
     }
 
     /**

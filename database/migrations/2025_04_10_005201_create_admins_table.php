@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notarios', function (Blueprint $table) {
+        Schema::create('admins', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
+            $table->string('nombres');
             $table->string('apellidos');
-            $table->string('telefono');
-            $table->string('direccion');
-            $table->unsignedBigInteger('user_id')->unique();
+
+            // Foreign key to the users table
+            $table->usingnedBigInteger('user_id')->unique();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notarios');
+        Schema::dropIfExists('admins');
     }
 };

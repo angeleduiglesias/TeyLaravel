@@ -14,15 +14,8 @@ class StoreTramiteRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // if(Auth::check() && Auth::user()->rol === 'admin') {
-        //     return true;
-        // }
-
-        // throw new HttpResponseException(response()->json([
-        //     'error' => 'No tienes permiso para acceder a esta información.'
-        // ], 403));
-
-        return true;
+        parent::authorize(); // Verifica autenticación
+        return $this->authorizeRoles(['cliente', 'admin']); // Verifica que tenga rol adecuado
     }
 
     /**

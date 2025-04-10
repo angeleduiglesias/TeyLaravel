@@ -11,7 +11,22 @@ class IndexNotarioRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Verifica si el usuario está autenticado
+        if (!$this->user()) {
+            throw new HttpResponseException(response()->json([
+                'error' => 'No estás autenticado.'
+            ], 401));
+        }
+
+        $user = auth()->user();
+
+        if($user->rol === 'notario') {
+            return true;
+        }else{
+            throw new HttpResponseException(response()->json([
+                'error' => 'No tienes permiso correspondientes.'
+            ], 403));
+        }
     }
 
     /**

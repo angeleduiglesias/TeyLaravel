@@ -11,14 +11,8 @@ class IndexClienteRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if (auth()->check() && auth()->user()->rol === 'admin') {
-            return true;
-        }
-
-        // Lanzamos una excepción con una respuesta personalizada si el usuario no está autorizado.
-        throw new HttpResponseException(response()->json([
-            'error' => 'No tienes permiso para acceder a esta información.'
-        ], 403));
+        parent::authorize(); // Verifica autenticación
+        return $this->authorizeRoles(['cliente']); // Verifica que tenga rol adecuado
     }
 
     /**

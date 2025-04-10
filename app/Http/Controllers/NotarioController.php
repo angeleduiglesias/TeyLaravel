@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\Notario\StoreNotarioRequest;
+use App\Http\Requests\Notario\DestroyNotarioRequest;
 use App\Services\FirebaseAuthService;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -15,9 +16,15 @@ class NotarioController extends Controller
      */
     public function index()
     {
-        $notarios = Notario::all();
-
-        return response()->json($notarios, 200); // Código de respuesta HTTP 200 OK
+        $documentos = Docuemento::all();
+        $nombre_cliente = auth()->user()->cliente->nombre;
+        $apellidos_cliente = auth()->user()->cliente->apellidos;
+        return response()->json([
+            'documentos' => $documentos,
+            'nombre_cliente' => $nombre_cliente,
+            'apellidos_cliente' => $apellidos_cliente
+        ], 200); 
+        
     }
 
     /**
@@ -40,14 +47,14 @@ class NotarioController extends Controller
 
         // Crea el usuario en la base de datos local.
         $user = User::create([
-            'full_name'     => $data['full_name'],
             'email'    => $data['email'],
             'password' => Hash::make($passwordTemporal), // Guarda la contraseña encriptada
             'rol'      => 'notario',
         ]);
 
         $notario = Notario::create([
-            'full_name' => $data['full_name'],
+            'nombre' => $data['nombre'],
+            'apellidos' => $data['apellidos'],
             'telefono'  => $data['telefono'],
             'direccion' => $data['direccion'],
             'user_id'   => $user->id,
@@ -70,24 +77,63 @@ class NotarioController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(ShowNotarioRequest $request, string $id): JsonResponse
     {
-        //
+        // Buscamos el notario por su id
+        $notario = Notario::find($id);
+
+        // Si no se encuentra el notario, se devuelve un error 404
+        if (!$notario) {
+            return response()->json(['error' => 'Notario no encontrado'], 404);
+        }
+
+        // Devolvemos los datos del notario
+        return response()->json($notario, 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateNotarioRequest $request, string $id)
     {
-        //
+        $notario = Notario::find($id);
+        $data = $request->validated();
+
+        // Si no se encuentra el notario, se devuelve un error 404
+        if (!$notario) {
+            return response()->json(['error' => 'Notario no encontrado'], 404);
+        }
+
+        // Se actualiza el registro del notario y se notifica.
+        $notario->update($data);
+        return response()->json([
+            'message' => 'Datos Actualizados con éxito.',
+            'notario' => $notario
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(DestroyNotarioRequest $request, string $id, FirebaseAuthService $firebaseAuth): JsonResponse
     {
-        //
+        //Buscamos el notario por su id
+        $notario = Notario::find($id);
+
+        // Si no se encuentra el notario, se devuelve un error 404
+        if (!$notario) {
+            return response()->json(['error' => 'Notario no encontrado'], 404);
+        }
+
+        // Eliminar el notario
+        $notario->delete();
+
+        // Eliminar el usuario asociado al notario
+        $user = User::find($notario->user_id);
+        if ($user) {
+            $user->delete();
+        }
+        // Enviar una respuesta confirmando la eliminación.
+        return response()->json(['message' => 'Notario eliminado correctamente'], 200);
     }
 }

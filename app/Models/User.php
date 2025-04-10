@@ -17,7 +17,6 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'full_name',
         'email',
         'password',
         'rol',
@@ -57,5 +56,11 @@ class User extends Authenticatable
     {
         // Indicamos que un usuario tiene un cliente.
         return $this->hasOne(Cliente::class, 'user_id');
+    }
+
+    public function admin(): HasOne
+    {
+        // Indicamos que un usuario tiene un admin.
+        return $this->hasOne(Admin::class, 'user_id');
     }
 }

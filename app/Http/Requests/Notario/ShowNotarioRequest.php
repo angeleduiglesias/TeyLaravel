@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Notario;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ShowNotarioRequest extends FormRequest
 {
@@ -11,7 +12,8 @@ class ShowNotarioRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        parent::authorize();
+        return $this->authorizeRoles(['notario']);
     }
 
     /**
@@ -22,7 +24,7 @@ class ShowNotarioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            // No se requieren reglas de validación para este caso.
         ];
     }
 }

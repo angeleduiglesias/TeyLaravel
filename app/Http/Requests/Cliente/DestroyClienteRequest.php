@@ -11,15 +11,9 @@ class DestroyClienteRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Solo los usuarios con rol de 'admin' pueden eliminar clientes
-        if (auth()->check() && auth()->user()->rol === 'admin') {
-            return true;
-        }
+        parent::authorize(); // Verifica autenticación
 
-        // Lanzamos una excepción con una respuesta personalizada si el usuario no está autorizado.
-        throw new HttpResponseException(response()->json([
-            'error' => 'No tienes permiso para eliminar clientes.'
-        ], 403));
+        return $this->authorizeRoles(['admin']); // Verifica que tenga rol adecuado
     }
 
     /**

@@ -11,7 +11,8 @@ class DestroyNotarioRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        parent::authorize(); // Verifica autenticación
+        return $this->authorizeRoles(['admin']); // Verifica que tenga rol adecuado
     }
 
     /**
@@ -22,7 +23,10 @@ class DestroyNotarioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nombre' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
+            'telefono' => 'required|string|max:255',
+            'direccion' => 'required|string|max:255',
         ];
     }
 }

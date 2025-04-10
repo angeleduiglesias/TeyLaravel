@@ -11,7 +11,20 @@ class UpdateNotarioRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Verificamos si el usuario está autenticado.
+        if (!auth()->check()) {
+            throw new HttpResponseException(response()->json([
+                'error' => 'No estás autenticado.'
+            ], 401));
+        }
+        
+        // Obtenemos el usuario autenticado.
+        $user = auth()->user();
+
+        // Si el usuario es notario, puede actualizar sus datos.
+        if ($user->rol === 'notario') {
+            return true;
+        } 
     }
 
     /**
@@ -22,7 +35,10 @@ class UpdateNotarioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nombre' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
+            'telefono' => 'required|digits:9',
+            'direccion' => 'required|string|max:255',
         ];
     }
 }

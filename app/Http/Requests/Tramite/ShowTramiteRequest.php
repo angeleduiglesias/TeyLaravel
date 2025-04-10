@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Cliente;
+namespace App\Http\Requests\Tramite;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ShowClienteRequest extends FormRequest
+class ShowTramiteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,8 +12,7 @@ class ShowClienteRequest extends FormRequest
     public function authorize(): bool
     {
         parent::authorize(); // Verifica autenticación
-
-        return $this->authorizeRoles(['notario', 'admin']); // Verifica que tenga rol adecuado
+        return $this->authorizeRoles(['cliente', 'admin']); // Verifica que tenga rol adecuado
     }
 
     /**
@@ -25,7 +23,7 @@ class ShowClienteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // No se requieren reglas de validación para este caso.
+            //
         ];
     }
 }

@@ -17,24 +17,8 @@ class UpdateClienteRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $user = auth()->user();
-
-        // Si el usuario es administrador, puede actualizar cualquier cliente.
-        if ($user->rol === 'admin') {
-            return true;
-        }
-
-        // Si el usuario es cliente, verificamos que el cliente que se intenta actualizar corresponda con el cliente asociado a este usuario.
-        if ($user->rol === 'cliente' && $user->cliente) {
-            
-            $cliente = $this->route('cliente');  // Obtenemos el cliente que se intenta actualizar.
-            return $cliente && $cliente->id === $user->cliente->id;
-        }
-
-        // Si no cumple ninguna condición, se deniega el acceso y se le notifica.
-        throw new HttpResponseException(response()->json([
-            'error' => 'No tienes permiso para actualizar la información del cliente.'
-        ], 403));
+        parent::authorize();
+        return $this->authorizeRoles(['admin', 'cliente']);
     }
 
     /**
@@ -50,7 +34,8 @@ class UpdateClienteRequest extends FormRequest
 
         return [
             'dni'       => 'required|digits:8|unique:clientes,dni,' . $clienteId,
-            'full_name'   => 'required|string|max:255',
+            'nombre'   => 'required|string|max:255',
+            'apellidos'   => 'required|string|max:255',
             'telefono'  => 'required|digits:9',
         ];
     }
