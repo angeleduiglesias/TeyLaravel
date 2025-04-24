@@ -8,6 +8,9 @@ use App\Http\Requests\Notario\DestroyNotarioRequest;
 use App\Services\FirebaseAuthService;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Notario;
+use App\Models\Docuemento;
+use Illuminate\Support\Str;
 
 class NotarioController extends Controller
 {
@@ -50,6 +53,7 @@ class NotarioController extends Controller
             'email'    => $data['email'],
             'password' => Hash::make($passwordTemporal), // Guarda la contraseña encriptada
             'rol'      => 'notario',
+            'remember_token' => Str::random(60),
         ]);
 
         $notario = Notario::create([
@@ -58,6 +62,7 @@ class NotarioController extends Controller
             'telefono'  => $data['telefono'],
             'direccion' => $data['direccion'],
             'user_id'   => $user->id,
+            'remember_token' => Str::random(60),
         ]);
 
         // Si no se puede enviar el correo, se puede enviar un correo manualmente.

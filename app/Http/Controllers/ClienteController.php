@@ -13,6 +13,7 @@ use App\Services\FirebaseAuthService;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Cliente;
+use Illuminate\Support\Str;
 
 class ClienteController extends Controller
 {
@@ -49,6 +50,7 @@ class ClienteController extends Controller
             'email'    => $data['email'],
             'password' => Hash::make($passwordTemporal), // Guarda la contraseña encriptada
             'rol'      => 'cliente',
+            'remember_token' => Str::random(60),
         ]);
 
         // Crea el los datos adicionales del Cliente en la tabla cliente.
@@ -57,6 +59,7 @@ class ClienteController extends Controller
             'apellidos' => $data['apellidos'],
             'telefono'  => $data['telefono'],
             'user_id'   => $user->id,
+            'remember_token' => Str::random(60),
         ]);
 
         // Si no se puede enviar el correo, se puede enviar un correo manualmente.

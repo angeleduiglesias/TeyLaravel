@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Services\FirebaseAuthService;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Admin;
 
@@ -39,6 +40,7 @@ class AdminSeeder extends Seeder
             'email'    => $email,
             'password' => Hash::make($password),
             'rol'      => 'admin',
+            'remember_token' => Str::random(60),
         ]);
 
         // Crear datos del admin en tabla admins

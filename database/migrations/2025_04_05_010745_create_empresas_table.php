@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('actividad_comercial');
             $table->enum('tipo_empresa',['sociedad anonima', 'sociedad resp limitada', 'empresario individual']);
 
-            $table->usingnedBigInteger('cliente_id')->unique();
+            $table->unsignedBigInteger('cliente_id')->unique();
             $table->foreign('cliente_id')->references('id')->on('clientes');
             $table->timestamps();
         });
