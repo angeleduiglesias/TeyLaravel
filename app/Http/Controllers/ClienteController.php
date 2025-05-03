@@ -28,52 +28,20 @@ class ClienteController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Profile se utiliza para enviar los datos al panel identificando su id.
      */
-    public function store(StoreClienteRequest $request, FirebaseAuthService $firebaseAuth)
+    public function profile(Request $request): JsonResponse
     {
-        // Datos validados
-        $data = $request->validated();
+        $user = auth()->user(); // Usuario autenticado (desde la tabla `users`)
         
-        // Genera o asigna la contraseña predeterminada.
-        $passwordTemporal = 'DitechPeru2025';
+        // Obtener cliente relacionado si usas relación con tabla clientes
+        $cliente = Cliente::where('user_id', $user->id)->first();
 
-        // Crea el Cliente en Firebase con la contraseña temporal.
-        try {
-            $firebaseUser = $firebaseAuth->createUser($data['email'], $passwordTemporal);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 422);
+        if (!$cliente) {
+            return response()->json(['error' => 'Cliente no encontrado'], 404);
         }
 
-        // Crea el Cliente en la base de datos local.
-        $user = User::create([
-            'email'    => $data['email'],
-            'password' => Hash::make($passwordTemporal), // Guarda la contraseña encriptada
-            'rol'      => 'cliente',
-            'remember_token' => Str::random(60),
-        ]);
-
-        // Crea el los datos adicionales del Cliente en la tabla cliente.
-        $cliente = Cliente::create([
-            'nombre' => $data['nombre'],
-            'apellidos' => $data['apellidos'],
-            'telefono'  => $data['telefono'],
-            'user_id'   => $user->id,
-            'remember_token' => Str::random(60),
-        ]);
-
-        // Si no se puede enviar el correo, se puede enviar un correo manualmente.
-        try {
-            $firebaseAuth->sendPasswordResetEmail($user['email']);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Cliente creado, pero no se pudo enviar el correo de restablecimiento.'
-            ], 422);
-        }
-
-        return response()->json([
-            'message' => 'Cliente registrado correctamente. Se ha enviado un correo para restablecer la contraseña.'
-        ]);
+        return response()->json($cliente, 200);
     }
 
     /**

@@ -12,16 +12,18 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FormController;
 
-
+//Ruta para el login
 Route::post('/login', [AuthController::class, 'login']);
 
-// Ruta para registrar un nuevo cliente.
-Route::post('/cliente/store', [ClienteController::class, 'store']);
+// Ruta para el preform.
 Route::post('/pre-form', [FormController::class, 'store']);
 
 
 // Rutas protegidas por autenticación.
 Route::middleware(['auth:sanctum'])->group(function () {
+
+    //Ruta para enviar los datos al panel cliente por su id.
+    Route::get('/cliente/profile', [ClienteController::class, 'profile']);
 
     // Rutas protegidas para el trámite.
     Route::get('/tramite', [TramiteController::class, 'index']);
@@ -61,8 +63,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Rutas protegidas para el admin.
     Route::get('/admin/dashboard', [AdminController::class, 'index']);
 
-    // Rutas protegidas para el usuario.
-    Route::get('/user', [UserController::class, 'index']);
 
     // Ruta para cerrar sesión.
     Route::post('/logout', [AuthController::class, 'logout']);

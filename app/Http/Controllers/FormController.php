@@ -56,7 +56,7 @@ class FormController extends Controller
                 'posible_nombre2' => $data['posible_nombre2'],
                 'posible_nombre3' => $data['posible_nombre3'],
                 'posible_nombre4' => $data['posible_nombre4'],
-                'numero_socios' => $data['numero_socios'],
+                'numero_socios' => $data['numero_socios'],  //aca debes cambiar para que sea nulo
                 'cliente_id' => $cliente->id,
             ]);
             $empresa->save();
