@@ -15,9 +15,17 @@ return new class extends Migration
             $table->id();
             //columnas de la tabla empresas primer formulario
             $table->string('nombre_empresa');
-            $table->string('actividad_comercial');
-            $table->enum('tipo_empresa',['sociedad anonima', 'sociedad resp limitada', 'empresario individual']);
-
+            $table->string('actividades')->nullable();
+            $table->string('rubro');
+            $table->enum('tipo_empresa',['SAC', 'EIRL']);
+            $table->string('posible_nombre1');
+            $table->string('posible_nombre2');
+            $table->string('posible_nombre3');
+            $table->string('posible_nombre4');
+            $table->integer('numero_socios')->null();
+            $table->enum('tipo_aporte',['dinero', 'bienes', 'mixto']);
+            $table->string('rango_capital');
+            
             $table->unsignedBigInteger('cliente_id')->unique();
             $table->foreign('cliente_id')->references('id')->on('clientes');
             $table->timestamps();

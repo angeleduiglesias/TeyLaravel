@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Cliente extends Model
 {
     protected $fillable=[
+        'dni',
         'nombre',
         'apellidos',
         'telefono',

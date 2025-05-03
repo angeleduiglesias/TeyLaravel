@@ -8,9 +8,18 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Empresa extends Model
 {
     protected $fillable = [
+        'tipo_aporte',
+        'rango_capital',
+        'rubro', 
+        'actividades',
+        'tipo_empresa',
         'nombre_empresa',
-        'actividad_comercial',
-        'tipo_empresa'
+        'posible_nombre1',
+        'posible_nombre2',
+        'posible_nombre3',
+        'posible_nombre4',
+        'numero_socios',
+        'cliente_id',
     ];
 
     public function cliente(): HasOne

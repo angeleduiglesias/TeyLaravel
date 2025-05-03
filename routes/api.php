@@ -9,13 +9,15 @@ use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\NotarioController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\FormController;
 
 
 Route::post('/login', [AuthController::class, 'login']);
 
 // Ruta para registrar un nuevo cliente.
 Route::post('/cliente/store', [ClienteController::class, 'store']);
-
+Route::post('/pre-form', [FormController::class, 'store']);
 
 
 // Rutas protegidas por autenticación.
