@@ -31,7 +31,7 @@ class FormController extends Controller
             ]);
             $user->save();
 
-            
+
             $cliente = Cliente::create([
                 'dni' => $data['dni'],
                 'nombre' => $data['nombre'],
@@ -59,8 +59,27 @@ class FormController extends Controller
                 'numero_socios' => $data['numero_socios'],
                 'cliente_id' => $cliente->id,
             ]);
-
             $empresa->save();
+
+            // Genera o asigna la contraseña predeterminada.
+            $passwordTemporal = 'DitechPeru2025';
+            // Crea el Cliente en Firebase con la contraseña temporal.
+            try {
+                $firebaseUser = $firebaseAuth->createUser($data['email'], $passwordTemporal);
+            } catch (\Exception $e) {
+                return response()->json(['error' => $e->getMessage()], 422);
+            }
+
+             // Si no se puede enviar el correo mediante Firebase, se puede enviar un correo manualmente.
+            try {
+                $firebaseAuth->sendPasswordResetEmail($user['email']);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error' => 'Cliente creado, pero no se pudo enviar el correo de restablecimiento.'
+                ], 422);
+            }
+
+
 
 
             return response()->json(['message' => 'Formulario guardado correctamente.']);
