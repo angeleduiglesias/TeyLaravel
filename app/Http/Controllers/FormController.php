@@ -70,7 +70,7 @@ class FormController extends Controller
                 return response()->json(['error' => $e->getMessage()], 422);
             }
 
-             // Si no se puede enviar el correo mediante Firebase, se puede enviar un correo manualmente.
+            // Si no se puede enviar el correo mediante Firebase, se puede enviar un correo manualmente.
             try {
                 $firebaseAuth->sendPasswordResetEmail($user['email']);
             } catch (\Exception $e) {
