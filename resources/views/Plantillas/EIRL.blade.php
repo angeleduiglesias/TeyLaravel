@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Minuta de Constitución E.I.R.L. con </title>
-  <link rel="stylesheet" href="{{}}"/>
 </head>
 <body>
   foreach ($data as $item)
