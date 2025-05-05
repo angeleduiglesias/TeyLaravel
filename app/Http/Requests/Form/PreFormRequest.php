@@ -32,7 +32,7 @@ class PreFormRequest extends FormRequest
             'posible_nombre2'  => 'required|string|max:255',
             'posible_nombre3'  => 'required|string|max:255',
             'posible_nombre4'  => 'required|string|max:255',
-            'numero_socios'  => 'required|integer|min:1|max:100',
+            'numero_socios'  => 'nullable|integer|min:1|max:100',
             'dni'=> 'required|string|size:8|unique:clientes,dni',
             'nombre'  => 'required|string|max:255',
             'apellidos'  => 'required|string|max:255',
