@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('posible_nombre2');
             $table->string('posible_nombre3');
             $table->string('posible_nombre4');
-            $table->integer('numero_socios')->null();
+            $table->integer('numero_socios')->nullable();
             $table->enum('tipo_aporte',['dinero', 'bienes', 'mixto']);
             $table->string('rango_capital');
             
