@@ -21,39 +21,49 @@ class AdminController extends Controller
         $notarios = Notario::all();
         $empresas = Empresa::all();
 
-        $total_clientes = $clientes->count();
-        $total_tramites = $tramites->count();
-        $total_documentos = $documentos->count();
+        //card
+        $clientes_registrados = $clientes->count();
+        $clientes_activos = $clientes->where('estado', 'activo')->count();
+        $tramites_pendientes = $tramites->where('estado', 'pendiente')->count();
+
+        // mostrar los tramites recientes pero con solo 15 registros
+        $tramites_recientes = $tramites->where('created_at', '>=', now()->subDays(30))->take(15)->get();
+
+        //mostrar los pagos recientes pero con solo 10 registros
+        $pagos_recientes = Pago::where('created_at', '>=', now()->subDays(30))->take(10)->get();
 
         // Return a JSON response with the data
         return response()->json([
-            'users' => $users,
-            'clientes' => $clientes,
-            'tramites' => $tramites,
-            'documentos' => $documentos,
-            'notarios' => $notarios,
-            'empresas' => $empresas,
-            'total_clientes' => $total_clientes,
-            'total_tramites' => $total_tramites,
-            'total_documentos' => $total_documentos,
+            $clientes,
+            $tramites,
+            $documentos,
+            $notarios,
+            $empresas,
+            $clientes_registrados,
+            $clientes_activos,
+            $tramites_pendientes,
+            $tramites_recientes,
+            $pagos_recientes,
         ]);
     }
     
 
     /**
-     * Store a newly created resource in storage.
+     * Funcion para enviar todos los datos del Cliente.
      */
-    public function store(Request $request)
+    public function clientes()
     {
-        //
+        $clientes = Cliente::all();
+        return response()->json($clientes);
     }
 
     /**
-     * Display the specified resource.
+     * Funcion para enviar todos los datos del Notario.
      */
-    public function show(string $id)
+    public function notario()
     {
-        //
+        $notarios = Notario::all();
+        return response()->json($notarios);
     }
 
     /**

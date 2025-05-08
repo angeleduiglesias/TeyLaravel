@@ -62,9 +62,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Rutas protegidas para el admin.
     Route::get('/admin/dashboard', [AdminController::class, 'index']);
+    Route::get('/admin/clientes', [AdminController::class, 'clientes']);
+    Route::get('/admin/notarios', [AdminController::class, 'notarios']);
 
 
     // Ruta para cerrar sesión.
     Route::post('/logout', [AuthController::class, 'logout']);
-
 });
