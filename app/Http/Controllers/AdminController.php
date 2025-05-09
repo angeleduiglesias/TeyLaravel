@@ -10,6 +10,7 @@ use App\Models\Notario;
 use App\Models\Empresa;
 use App\Models\Pago;
 use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
@@ -26,15 +27,12 @@ class AdminController extends Controller
             return response()->json(['message' => 'No tienes permisos'], 403);
         }
 
-        // Fetch data from the database
-        $clientes = Cliente::all();
-        $documentos = Documento::all();
-        $notarios = Notario::all();
-        $empresas = Empresa::all();
+        $admin = Admin::where('user_id', $user->id)->first();
+        $nombre_admin = $admin ? $admin->nombres : null;
 
         //card
-        $clientes_registrados = $clientes->count();
-        $clientes_activos = $clientes->where('estado', 'activo')->count();
+        $clientes_registrados = Cliente::count();
+        $clientes_activos = Cliente::where('estado', 'activo')->count();
         $tramites_pendientes = Tramite::where('estado', 'pendiente')->count();
 
         // mostrar los tramites recientes pero con solo 15 registros
@@ -45,15 +43,12 @@ class AdminController extends Controller
 
         // Return a JSON response with the data
         return response()->json([
-            $clientes,
-            $documentos,
-            $notarios,
-            $empresas,
-            $clientes_registrados,
-            $clientes_activos,
-            $tramites_pendientes,
-            $tramites_recientes,
-            $pagos_recientes,
+            'nombre_admin' => $nombre_admin,
+            'clientes_registrados' => $clientes_registrados,
+            'clientes_activos' => $clientes_activos,
+            'tramites_pendientes' => $tramites_pendientes,
+            'tramites_recientes' => $tramites_recientes,
+            'pagos_recientes' => $pagos_recientes,
         ]);
     }
     
