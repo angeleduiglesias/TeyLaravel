@@ -27,19 +27,46 @@ class AdminController extends Controller
             return response()->json(['message' => 'No tienes permisos'], 403);
         }
 
+        // envia el nombre del admin
         $admin = Admin::where('user_id', $user->id)->first();
         $nombre_admin = $admin ? $admin->nombres : null;
 
-        //card
-        $clientes_registrados = Cliente::count();
+        // proceso para obtener el tipo de documento por el id del cliente
+        $cliente = Cliente::first(); 
+        $tramite = $cliente ? Tramite::where('cliente_id', $cliente->id)->first() : null;
+        $documento = $tramite ? Documento::where('tramite_id', $tramite->id)->first() : null;
+
+        $tipo_documento = $documento ? $documento->tipo_documento : 'Desconocido';
+        $nombre_cliente = $cliente ? $cliente->nombre . ' ' . $cliente->apellidos : 'Sin nombre';
+        $fecha_tramite = $tramite ? $tramite->fecha_inicio : null;
+        $estado_tramite = $tramite ? $tramite->estado : null;
+
+        $clientes_registrados = Cliente::count(); 
         $clientes_activos = Cliente::where('estado', 'activo')->count();
         $tramites_pendientes = Tramite::where('estado', 'pendiente')->count();
 
-        // mostrar los tramites recientes pero con solo 15 registros
-        $tramites_recientes = Tramite::where('created_at', '>=', now()->subDays(30))->take(15)->get();
+        $tramites_recientes = [
+            [
+                'tipo_documento' => $tipo_documento,
+                'cliente' => $nombre_cliente,
+                'fecha_tramite' => $fecha_tramite,
+                'estado_tramite' => $estado_tramite
+            ]
+        ];
 
-        //mostrar los pagos recientes pero con solo 10 registros
-        $pagos_recientes = Pago::where('created_at', '>=', now()->subDays(30))->take(10)->get();
+        $pago = Pago::latest()->first(); // último pago
+
+        $pagos_recientes = [
+            [
+                'cliente' => $nombre_cliente,
+                'monto_pago' => $pago ? $pago->monto : null,
+                'fecha' => $pago ? $pago->fecha : null,
+                'tipo_pago' => $pago ? $pago->tipo_pago : null
+            ]
+            
+        ];
+
+        // return logger($tramites_recientes);
 
         // Return a JSON response with the data
         return response()->json([
@@ -49,7 +76,7 @@ class AdminController extends Controller
             'tramites_pendientes' => $tramites_pendientes,
             'tramites_recientes' => $tramites_recientes,
             'pagos_recientes' => $pagos_recientes,
-        ]);
+        ]); 
     }
     
 
