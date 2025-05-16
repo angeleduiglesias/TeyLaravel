@@ -22,53 +22,53 @@ class AdminController extends Controller
     {
         $user = auth()->user();
 
-        // Verifica si el usuario es admin
-        if ($request->user()->rol !== 'admin') {
+        if ($user->rol !== 'admin') {
             return response()->json(['message' => 'No tienes permisos'], 403);
         }
 
-        // envia el nombre del admin
+        // Nombre del admin
         $admin = Admin::where('user_id', $user->id)->first();
-        $nombre_admin = $admin ? $admin->nombres : null;
+        $nombre_admin = $admin ? $admin->nombres+ ' ' + $admin->apellidos : 'Administrador';
 
-        // proceso para obtener el tipo de documento por el id del cliente
-        $cliente = Cliente::first(); 
-        $tramite = $cliente ? Tramite::where('cliente_id', $cliente->id)->first() : null;
-        $documento = $tramite ? Documento::where('tramite_id', $tramite->id)->first() : null;
-
-        $tipo_documento = $documento ? $documento->tipo_documento : 'Desconocido';
-        $nombre_cliente = $cliente ? $cliente->nombre . ' ' . $cliente->apellidos : 'Sin nombre';
-        $fecha_tramite = $tramite ? $tramite->fecha_inicio : null;
-        $estado_tramite = $tramite ? $tramite->estado : null;
-
+        // Métricas generales
         $clientes_registrados = Cliente::count(); 
         $clientes_activos = Cliente::where('estado', 'activo')->count();
         $tramites_pendientes = Tramite::where('estado', 'pendiente')->count();
 
-        $tramites_recientes = [
-            [
-                'tipo_documento' => $tipo_documento,
-                'cliente' => $nombre_cliente,
-                'fecha_tramite' => $fecha_tramite,
-                'estado_tramite' => $estado_tramite
-            ]
-        ];
+        // Últimos 15 documentos con cliente y tramite
+        $documentos = Documento::with(['tramite.cliente'])
+            ->latest()
+            ->take(15)
+            ->get();
 
-        $pago = Pago::latest()->first(); // último pago
+        $tramites_recientes = $documentos->map(function ($doc) {
+            $cliente = $doc->tramite->cliente ?? null;
+            return [
+                'tipo_documento' => $doc->tipo_documento,
+                'nombre_cliente' => $cliente ? $cliente->nombre . ' ' . $cliente->apellidos : 'Sin nombre',
+                'fecha_tramite' => $doc->tramite->fecha_inicio ?? null,
+                'estado_tramite' => $doc->estado,
+            ];
+        });
 
-        $pagos_recientes = [
-            [
-                'cliente' => $nombre_cliente,
-                'monto_pago' => $pago ? $pago->monto : null,
-                'fecha' => $pago ? $pago->fecha : null,
-                'tipo_pago' => $pago ? $pago->tipo_pago : null
-            ]
-            
-        ];
+        // Últimos 15 pagos con cliente
+        $pagos = Pago::with(['tramite.cliente'])
+            ->latest()
+            ->take(15)
+            ->get();
 
-        // return logger($tramites_recientes);
+        $pagos_recientes = $pagos->map(function ($pago) {
+            $cliente = $pago->tramite->cliente ?? null;
+            return [
+                'nombre_cliente' => $cliente ? $cliente->nombre . ' ' . $cliente->apellidos : 'Sin nombre',
+                'monto_pago' => $pago->monto,
+                'fecha' => $pago->fecha,
+                'tipo_pago' => $pago->tipo_pago,
+                'estado_pago' => $pago->estado,
+            ];
+        });
 
-        // Return a JSON response with the data
+        // JSON de respuesta
         return response()->json([
             'nombre_admin' => $nombre_admin,
             'clientes_registrados' => $clientes_registrados,
@@ -76,7 +76,7 @@ class AdminController extends Controller
             'tramites_pendientes' => $tramites_pendientes,
             'tramites_recientes' => $tramites_recientes,
             'pagos_recientes' => $pagos_recientes,
-        ]); 
+        ]);
     }
     
 
@@ -85,9 +85,34 @@ class AdminController extends Controller
      */
     public function clientes()
     {
-        $clientes = Cliente::all();
-        return response()->json($clientes);
+        $user = auth()->user();
+
+        if ($user->rol !== 'admin') {
+            return response()->json(['message' => 'No tienes permisos'], 403);
+        }
+
+        $clientes = Cliente::with([
+            'empresa:id,cliente_id,tipo_empresa',
+            'tramite.pagos' // si tienes esta relación configurada
+        ])->get();
+
+        $data = $clientes->map(function ($cliente) {
+            // Obtener estado del primer o último pago si existe
+            $pagoEstado = optional($cliente->tramite->pagos->last())->estado ?? 'Sin pagos';
+
+            return [
+                'nombre_cliente' => $cliente->nombre . ' ' . $cliente->apellidos,
+                'dni' => $cliente->dni,
+                'tipo_empresa' => optional($cliente->empresa)->tipo_empresa ?? 'No registrada',
+                'progreso' => optional($cliente->tramite)->estado ?? 'No iniciado', // depende de tu campo en 'tramite'
+                'pago' => $pagoEstado,
+                'contacto' => $cliente->telefono,
+            ];
+        });
+
+        return response()->json($data);
     }
+
 
     /**
      * Funcion para enviar todos los datos del Notario.

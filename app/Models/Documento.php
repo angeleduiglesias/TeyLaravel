@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class Documento extends Model
 {
     protected $table = 'documentos';
@@ -15,9 +17,9 @@ class Documento extends Model
         'observaciones',
     ];
 
-    public function tramite(): HasOne
+    public function tramite(): BelongsTo
     {
-        return $this->hasOne(Tramite::class, 'tramite_id');
+        return $this->belongsTo(Tramite::class);
     }
 
     public function notario()

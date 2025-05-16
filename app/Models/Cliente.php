@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Cliente extends Model
 {
@@ -16,10 +17,9 @@ class Cliente extends Model
         'user_id'
     ];
 
-    public function tramite(): HasOne
+    public function tramites(): HasOne
     {
-        // Indicamos que un Cliente tiene un Tramite
-        return $this->hasOne(Tramite::class, 'cliente_id');
+        return $this->hasOne(Tramite::class, 'cliente_id', 'id');
     }
 
     public function user(): BelongsTo
@@ -28,9 +28,9 @@ class Cliente extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function empresa(): BelongsTo
+    public function empresa(): HasOne
     {
         // Indicamos que un Cliente pertenece a una Empresa
-        return $this->belongsTo(Empresa::class, 'cliente_id');
+        return $this->hasOne(Empresa::class, 'cliente_id');
     }
 }

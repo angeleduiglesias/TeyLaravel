@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Empresa extends Model
 {
@@ -22,9 +22,9 @@ class Empresa extends Model
         'cliente_id',
     ];
 
-    public function cliente(): HasOne
+    public function cliente(): BelongsTo
     {
         // Indicamos que una Empresa pertenece a un Cliente
-        return $this->hasOne(Cliente::class, 'cliente_id');
+        return $this->belongsto(Cliente::class, 'cliente_id');
     }
 }
