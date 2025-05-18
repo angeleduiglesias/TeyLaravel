@@ -17,7 +17,7 @@ class Cliente extends Model
         'user_id'
     ];
 
-    public function tramites(): HasOne
+    public function tramite(): HasOne
     {
         return $this->hasOne(Tramite::class, 'cliente_id', 'id');
     }
@@ -31,6 +31,6 @@ class Cliente extends Model
     public function empresa(): HasOne
     {
         // Indicamos que un Cliente pertenece a una Empresa
-        return $this->hasOne(Empresa::class, 'cliente_id');
+        return $this->hasOne(Empresa::class, 'cliente_id', 'id');
     }
 }

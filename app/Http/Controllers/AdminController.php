@@ -97,16 +97,17 @@ class AdminController extends Controller
         ])->get();
 
         $data = $clientes->map(function ($cliente) {
+
             // Obtener estado del primer o último pago si existe
             $pagoEstado = optional($cliente->tramite->pagos->last())->estado ?? 'Sin pagos';
 
             return [
-                'nombre_cliente' => $cliente->nombre . ' ' . $cliente->apellidos,
-                'dni' => $cliente->dni,
+                'nombre_cliente' => $cliente->nombre . ' ' . $cliente->apellidos ?? 'Sin nombre',
+                'dni' => $cliente->dni ?? 'No registrado',
                 'tipo_empresa' => optional($cliente->empresa)->tipo_empresa ?? 'No registrada',
-                'progreso' => optional($cliente->tramite)->estado ?? 'No iniciado', // depende de tu campo en 'tramite'
-                'pago' => $pagoEstado,
-                'contacto' => $cliente->telefono,
+                'progreso' => optional($cliente->tramite)->estado ?? 'No iniciado', 
+                'estado' => $pagoEstado == 'pagado' ? 'Pagado' : 'Pendiente',
+                'contacto' => $cliente->telefono ?? 'No registrado',
             ];
         });
 
