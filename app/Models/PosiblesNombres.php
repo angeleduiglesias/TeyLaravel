@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PosiblesNombres extends Model
@@ -16,13 +15,9 @@ class PosiblesNombres extends Model
         'empresa_id'
     ];
 
-    public function empresa(): HasOne
+    public function empresa(): BelongsTo
     {
-        return $this->hasone(Empresa::class, 'empresa_id', 'id');
+        return $this->belongsto(Empresa::class, 'empresa_id', 'id');
     }
 
-    public function cliente():BelongsTo
-    {
-        return $this->belongsTo(Cliente::class, 'cliente_id', 'id');
-    }
 }

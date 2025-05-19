@@ -12,13 +12,14 @@ use App\Models\Pago;
 use App\Models\User;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Auth;
+use App\Models\PosiblesNombres;
 
 class AdminController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function dashboard(Request $request)
     {
         $user = auth()->user();
 
@@ -68,6 +69,29 @@ class AdminController extends Controller
             ];
         });
 
+        //Nombre del cliente con el nombre de la empresa
+        $clientes = Cliente::with('empresa')->get();
+        $nombre_empresa = $clientes->map(function ($cliente) {
+            return [
+                'nombre_cliente' => $cliente->nombre . ' ' . $cliente->apellidos,
+                'nombre_empresa' => $cliente->empresa ? $cliente->empresa->nombre : 'Sin empresa',
+                'tipo_empresa' => $cliente->empresa ? $cliente->empresa->tipo_empresa : 'Sin tipo de empresa',
+            ];
+        });
+
+        //Posibles nombres de empresa
+        $nombres_posibles = PosiblesNombres::with('empresa')->get();
+        $posibles_nombres = $nombres_posibles->map(function ($item) {
+            $empresa = $item->empresa;
+            return [
+                'posible_nombre1' => $empresa?->posible_nombre1 ?? 'Sin nombre',
+                'posible_nombre2' => $empresa?->posible_nombre2 ?? 'Sin nombre',
+                'posible_nombre3' => $empresa?->posible_nombre3 ?? 'Sin nombre',
+                'posible_nombre4' => $empresa?->posible_nombre4 ?? 'Sin nombre',
+            ];
+        });
+
+
         // JSON de respuesta
         return response()->json([
             'nombre_admin' => $nombre_admin,
@@ -76,6 +100,8 @@ class AdminController extends Controller
             'tramites_pendientes' => $tramites_pendientes,
             'tramites_recientes' => $tramites_recientes,
             'pagos_recientes' => $pagos_recientes,
+            'nombre_empresa' => $nombre_empresa,
+            'posibles_nombres' => $posibles_nombres,
         ]);
     }
     

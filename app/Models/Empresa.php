@@ -14,10 +14,6 @@ class Empresa extends Model
         'actividades',
         'tipo_empresa',
         'nombre_empresa',
-        'posible_nombre1',
-        'posible_nombre2',
-        'posible_nombre3',
-        'posible_nombre4',
         'numero_socios',
         'cliente_id',
     ];
