@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('tipo_pago', ['reserva_nombre', 'llenado_minuta']);
             
             $table->unsignedBigInteger('tramite_id');
-            $table->foreign('tramite_id')->references('id')->on('tramites');
+            $table->foreign('tramite_id')->references('id')->on('tramites')->onDelete('cascade');
             $table->timestamps();
         });
     }

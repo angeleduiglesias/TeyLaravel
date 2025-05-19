@@ -30,7 +30,6 @@ class FormController extends Controller
                 'rol' => 'cliente',
                 'remember_token' => Str::random(60),
             ]);
-            $user->save();
 
 
             $cliente = Cliente::create([
@@ -43,7 +42,6 @@ class FormController extends Controller
                 'remember_token' => Str::random(60),
                 
             ]);
-            $cliente->save();
 
 
             $empresa = Empresa::create([
@@ -54,16 +52,16 @@ class FormController extends Controller
                 'numero_socios' => $data['numero_socios'],
                 'cliente_id' => $cliente->id,
             ]);
-            $empresa->save();
 
             $posiblesNombres = PosiblesNombres::create([
-                'nombre_empresa' => $data['nombre_empresa'],
                 'posible_nombre1' => $data['posible_nombre1'],
                 'posible_nombre2' => $data['posible_nombre2'],
                 'posible_nombre3' => $data['posible_nombre3'],
                 'posible_nombre4' => $data['posible_nombre4'],
+                'empresa_id' => $empresa->id,
             ]);
-            $posiblesNombres->save();
+
+            
 
             // Genera o asigna la contraseña predeterminada.
             $passwordTemporal = 'DitechPeru2025';

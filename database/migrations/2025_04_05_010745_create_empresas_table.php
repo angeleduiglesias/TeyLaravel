@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('rango_capital');
             
             $table->unsignedBigInteger('cliente_id')->unique();
-            $table->foreign('cliente_id')->references('id')->on('clientes');
+            $table->foreign('cliente_id')->references('id')->on('clientes')->onDelete('cascade');
             $table->timestamps();
         });
     }

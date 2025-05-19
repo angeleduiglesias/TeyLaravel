@@ -18,9 +18,9 @@ return new class extends Migration
             $table->enum('tipo_documento', ['reserva_nombre', 'minuta']);
             
             $table->unsignedBigInteger('tramite_id');
-            $table->foreign('tramite_id')->references('id')->on('tramites');
+            $table->foreign('tramite_id')->references('id')->on('tramites')->onDelete('cascade');
             $table->unsignedBigInteger('notario_id');
-            $table->foreign('notario_id')->references('id')->on('notarios');
+            $table->foreign('notario_id')->references('id')->on('notarios')->onDelete('cascade');
             
             $table->timestamps();
         });
