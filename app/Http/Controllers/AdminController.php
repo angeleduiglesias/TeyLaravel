@@ -93,7 +93,7 @@ class AdminController extends Controller
 
         $clientes = Cliente::with([
             'empresa:id,cliente_id,tipo_empresa',
-            'tramite.pagos' // si tienes esta relación configurada
+            'tramite.pagos' 
         ])->get();
 
         $data = $clientes->map(function ($cliente) {

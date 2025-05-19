@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\Empresa;
+use App\Models\PosiblesNombres;
 
 
 class FormController extends Controller
@@ -50,16 +51,19 @@ class FormController extends Controller
                 'rango_capital' => $data['rango_capital'],
                 'rubro' => $data['rubro'],
                 'actividades' => $data['actividades'],
-                'tipo_empresa' => $data['tipo_empresa'],
+                'numero_socios' => $data['numero_socios'],
+                'cliente_id' => $cliente->id,
+            ]);
+            $empresa->save();
+
+            $posiblesNombres = PosiblesNombres::create([
                 'nombre_empresa' => $data['nombre_empresa'],
                 'posible_nombre1' => $data['posible_nombre1'],
                 'posible_nombre2' => $data['posible_nombre2'],
                 'posible_nombre3' => $data['posible_nombre3'],
                 'posible_nombre4' => $data['posible_nombre4'],
-                'numero_socios' => $data['numero_socios'],  //aca debes cambiar para que sea nulo
-                'cliente_id' => $cliente->id,
             ]);
-            $empresa->save();
+            $posiblesNombres->save();
 
             // Genera o asigna la contraseña predeterminada.
             $passwordTemporal = 'DitechPeru2025';

@@ -14,14 +14,10 @@ return new class extends Migration
         Schema::create('empresas', function (Blueprint $table) {
             $table->id();
             //columnas de la tabla empresas primer formulario
-            $table->string('nombre_empresa');
+            $table->string('nombre_empresa')->nullable();
             $table->string('actividades')->nullable();
             $table->string('rubro');
             $table->enum('tipo_empresa',['SAC', 'EIRL']);
-            $table->string('posible_nombre1');
-            $table->string('posible_nombre2');
-            $table->string('posible_nombre3');
-            $table->string('posible_nombre4');
             $table->integer('numero_socios')->nullable();
             $table->enum('tipo_aporte',['dinero', 'bienes', 'mixto']);
             $table->string('rango_capital');
