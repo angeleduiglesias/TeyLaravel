@@ -29,7 +29,7 @@ class AdminController extends Controller
 
         // Nombre del admin
         $admin = Admin::where('user_id', $user->id)->first();
-        $nombre_admin = $admin ? $admin->nombres+ ' ' + $admin->apellidos : 'Administrador';
+        $nombre_admin = $admin ? $admin->nombres . ' ' . $admin->apellidos : 'Administrador';
 
         // Métricas generales
         $clientes_registrados = Cliente::count(); 
