@@ -62,7 +62,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Rutas protegidas para el admin.
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
-    Route::get('/admin/cliente', [AdminController::class, 'clientes']);
+    Route::get('/admin/clientes', [AdminController::class, 'clientes']);
     Route::get('/admin/notarios', [AdminController::class, 'notarios']);
 
 
