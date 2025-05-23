@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\Empresa;
 use App\Models\PosiblesNombres;
-
+use App\Http\Requests\Form\PagosRequest;
+use App\Models\Pago;
 
 class FormController extends Controller
 {
@@ -94,6 +95,33 @@ class FormController extends Controller
                 'file' => $e->getFile(),
                 'trace' => $e->getTraceAsString(),
             ], 500);
+        }
+    }
+
+    public function pagosPreform(PagosRequest $request){
+        $data = $request->validate();
+
+        // Verificar si el DNI ya está registrado
+        if (Cliente::where('dni', $data['dni'])->exists()) {
+            // Se verifica que el dni ya esté registrado
+            $cliente = Cliente::where('dni', $data['dni'])->first();
+
+            //Se registra el pago
+            $pago = Pago::create([
+                'cliente_id' => $cliente->id,
+                'monto' => $data['monto'],
+                'fecha_pago' => now(),
+                'estado' => 'pendiente',
+            ]);
+
+            $reservaNombre = Documento::create([
+                'tipo_documento' => $data['tipo_pago'],
+                'pago_id' => $pago->id,
+            ]);
+
+            return response()->json([
+                'message' => 'Pago registrado correctamente.'
+            ]);
         }
     }
 

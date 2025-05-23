@@ -65,6 +65,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/clientes', [AdminController::class, 'clientes']);
     Route::get('/admin/notarios', [AdminController::class, 'notarios']);
 
+    Route::post('/cliente/pagos', [FormController::class, 'pagosPreform']);
+
 
     // Ruta para cerrar sesión.
     Route::post('/logout', [AuthController::class, 'logout']);

@@ -93,8 +93,13 @@ class AdminController extends Controller
         });
 
         $reserva_nombre = [
-            'posibles_nombres' => $posibles_nombres,
-            'nombre_empresa' => $nombre_empresa,
+            'posible_nombre1' => $posibles_nombres->pluck('posible_nombre1'),
+            'posible_nombre2' => $posibles_nombres->pluck('posible_nombre2'),
+            'posible_nombre3' => $posibles_nombres->pluck('posible_nombre3'),
+            'posible_nombre4' => $posibles_nombres->pluck('posible_nombre4'),
+            'nombre_cliente' => $nombre_empresa->pluck('nombre_cliente'),
+            'nombre_empresa' => $nombre_empresa->pluck('nombre_empresa'),
+            'tipo_empresa' => $nombre_empresa->pluck('tipo_empresa'),
         ];
 
         // JSON de respuesta
@@ -156,7 +161,7 @@ class AdminController extends Controller
 
         
 
-        return response()->json($posibles_nombres);
+        // return response()->json($posibles_nombres);
     }
 
 
@@ -170,7 +175,7 @@ class AdminController extends Controller
         if ($user->rol !== 'admin') {
             return response()->json(['message' => 'No tienes permisos'], 403);
         }
-        
+
         $notarios = Notario::all();
         return response()->json($notarios);
     }
