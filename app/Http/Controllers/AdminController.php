@@ -165,6 +165,12 @@ class AdminController extends Controller
      */
     public function notario()
     {
+        $user = auth()->user();
+
+        if ($user->rol !== 'admin') {
+            return response()->json(['message' => 'No tienes permisos'], 403);
+        }
+        
         $notarios = Notario::all();
         return response()->json($notarios);
     }
