@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PosiblesNombres;
+use App\Http\Requests\Admin\CambioNombreEmpresaRequest;
 
 class AdminController extends Controller
 {
@@ -91,6 +92,10 @@ class AdminController extends Controller
             ];
         });
 
+        $reserva_nombre = [
+            'posibles_nombres' => $posibles_nombres,
+            'nombre_empresa' => $nombre_empresa,
+        ];
 
         // JSON de respuesta
         return response()->json([
@@ -100,8 +105,7 @@ class AdminController extends Controller
             'tramites_pendientes' => $tramites_pendientes,
             'tramites_recientes' => $tramites_recientes,
             'pagos_recientes' => $pagos_recientes,
-            'nombre_empresa' => $nombre_empresa,
-            'posibles_nombres' => $posibles_nombres,
+            'reserva_nombre' => $reserva_nombre,
         ]);
     }
     
@@ -119,7 +123,8 @@ class AdminController extends Controller
 
         $clientes = Cliente::with([
             'empresa:id,cliente_id,tipo_empresa',
-            'tramite.pagos' 
+            'tramite.pagos',
+            'user:id,email'
         ])->get();
 
         $data = $clientes->map(function ($cliente) {
@@ -131,10 +136,27 @@ class AdminController extends Controller
                 'progreso' => optional($cliente->tramite)->estado ?? 'No iniciado', 
                 'estado' => $pagoEstado == 'pagado' ? 'Pagado' : 'Pendiente',
                 'contacto' => $cliente->telefono ?? 'No registrado',
+                'email' => $cliente->user->email ?? 'No registrado',
             ];
         });
 
         return response()->json($data);
+    }
+
+
+    /**
+     * Funcion para el cambio del nombre de empresa.
+     */
+    public function cambioNombreEmpresa(CambioNombreEmpresaRequest $request ){
+        $user = auth()->user();
+
+        if ($user->rol !== 'admin') {
+            return response()->json(['message' => 'No tienes permisos'], 403);
+        }
+
+        
+
+        return response()->json($posibles_nombres);
     }
 
 

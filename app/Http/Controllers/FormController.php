@@ -16,14 +16,22 @@ use App\Models\PosiblesNombres;
 
 class FormController extends Controller
 {
-    
-
     public function store(PreFormRequest $request, FirebaseAuthService $firebaseAuth)
     {
         try {
             $data = $request->validated();
 
-            // Crea el usuario y cliente
+            // Verificar si el email ya está registrado
+            if (User::where('email', $data['email'])->exists()) {
+                return response()->json(['error' => 'El correo electrónico ya está registrado.'], 422);
+            }
+
+            // Verificar si el DNI ya está registrado
+            if (Cliente::where('dni', $data['dni'])->exists()) {
+                return response()->json(['error' => 'El DNI ya está registrado.'], 422);
+            }
+
+            // Crea el usuario
             $user = User::create([
                 'email' => $data['email'],
                 'password' => Hash::make('DitechPeru2025'),
@@ -31,7 +39,7 @@ class FormController extends Controller
                 'remember_token' => Str::random(60),
             ]);
 
-
+            // Crea el cliente
             $cliente = Cliente::create([
                 'dni' => $data['dni'],
                 'nombre' => $data['nombre'],
@@ -40,10 +48,9 @@ class FormController extends Controller
                 'estado' => 'inactivo',
                 'user_id' => $user->id,
                 'remember_token' => Str::random(60),
-                
             ]);
 
-
+            // Crea la empresa
             $empresa = Empresa::create([
                 'tipo_aporte' => $data['tipo_aporte'],
                 'rango_capital' => $data['rango_capital'],
@@ -53,6 +60,7 @@ class FormController extends Controller
                 'cliente_id' => $cliente->id,
             ]);
 
+            // Crea los posibles nombres
             $posiblesNombres = PosiblesNombres::create([
                 'posible_nombre1' => $data['posible_nombre1'],
                 'posible_nombre2' => $data['posible_nombre2'],
@@ -61,28 +69,21 @@ class FormController extends Controller
                 'empresa_id' => $empresa->id,
             ]);
 
-            
-
-            // Genera o asigna la contraseña predeterminada.
-            $passwordTemporal = 'DitechPeru2025';
-            // Crea el Cliente en Firebase con la contraseña temporal.
+            // Crear usuario en Firebase
             try {
-                $firebaseUser = $firebaseAuth->createUser($data['email'], $passwordTemporal);
+                $firebaseUser = $firebaseAuth->createUser($data['email'], 'DitechPeru2025');
             } catch (\Exception $e) {
                 return response()->json(['error' => $e->getMessage()], 422);
             }
 
-            // Si no se puede enviar el correo mediante Firebase, se puede enviar un correo manualmente.
+            // Enviar email de restablecimiento de contraseña
             try {
-                $firebaseAuth->sendPasswordResetEmail($user['email']);
+                $firebaseAuth->sendPasswordResetEmail($user->email);
             } catch (\Exception $e) {
                 return response()->json([
                     'error' => 'Cliente creado, pero no se pudo enviar el correo de restablecimiento.'
                 ], 422);
             }
-
-
-
 
             return response()->json(['message' => 'Formulario guardado correctamente.']);
 
@@ -95,4 +96,5 @@ class FormController extends Controller
             ], 500);
         }
     }
+
 }

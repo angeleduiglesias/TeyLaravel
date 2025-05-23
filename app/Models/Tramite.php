@@ -27,7 +27,7 @@ class Tramite extends Model
         return $this->hasMany(Documento::class, 'tramite_id');
     }
 
-    public function Pago(): HasMany
+    public function pagos(): HasMany
     {
         // Indicamos que un tramite tiene muchos pagos
         return $this->hasMany(Pago::class, 'tramite_id');
