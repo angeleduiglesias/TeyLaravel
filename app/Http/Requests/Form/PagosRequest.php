@@ -11,7 +11,7 @@ class pagosRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -27,6 +27,7 @@ class pagosRequest extends FormRequest
             'tipo_pago' => 'required|string|in:reserva_nombre,llenado_minuta',
             'comprobante' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'estado' => 'required|string|in:pendiente,pagado',
+            'fecha' => 'required|date',
         ];
     }
 }

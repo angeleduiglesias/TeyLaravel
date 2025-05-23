@@ -75,7 +75,7 @@ class AdminController extends Controller
         $nombre_empresa = $clientes->map(function ($cliente) {
             return [
                 'nombre_cliente' => $cliente->nombre . ' ' . $cliente->apellidos,
-                'nombre_empresa' => $cliente->empresa ? $cliente->empresa->nombre : 'Sin empresa',
+                'nombre_empresa' => $cliente->empresa ? $cliente->empresa->nombre :  'Sin empresa',
                 'tipo_empresa' => $cliente->empresa ? $cliente->empresa->tipo_empresa : 'Sin tipo de empresa',
             ];
         });
@@ -92,15 +92,11 @@ class AdminController extends Controller
             ];
         });
 
-        $reserva_nombre = [
-            'posible_nombre1' => $posibles_nombres->pluck('posible_nombre1'),
-            'posible_nombre2' => $posibles_nombres->pluck('posible_nombre2'),
-            'posible_nombre3' => $posibles_nombres->pluck('posible_nombre3'),
-            'posible_nombre4' => $posibles_nombres->pluck('posible_nombre4'),
-            'nombre_cliente' => $nombre_empresa->pluck('nombre_cliente'),
-            'nombre_empresa' => $nombre_empresa->pluck('nombre_empresa'),
-            'tipo_empresa' => $nombre_empresa->pluck('tipo_empresa'),
-        ];
+        $reserva_nombre = $nombre_empresa->map(function ($item, $index) use ($posibles_nombres) {
+            return array_merge($item, $posibles_nombres[$index] ?? []);
+        });
+
+
 
         // JSON de respuesta
         return response()->json([
@@ -152,7 +148,7 @@ class AdminController extends Controller
     /**
      * Funcion para el cambio del nombre de empresa.
      */
-    public function cambioNombreEmpresa(CambioNombreEmpresaRequest $request ){
+    public function CambioNombreEmpresa(CambioNombreEmpresaRequest $request ){
         $user = auth()->user();
 
         if ($user->rol !== 'admin') {
@@ -161,7 +157,7 @@ class AdminController extends Controller
 
         
 
-        // return response()->json($posibles_nombres);
+        return response()->json();
     }
 
 

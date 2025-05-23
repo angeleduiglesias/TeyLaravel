@@ -14,6 +14,7 @@ use App\Models\Empresa;
 use App\Models\PosiblesNombres;
 use App\Http\Requests\Form\PagosRequest;
 use App\Models\Pago;
+use App\Models\Tramite;
 
 class FormController extends Controller
 {
@@ -59,6 +60,7 @@ class FormController extends Controller
                 'actividades' => $data['actividades'],
                 'numero_socios' => $data['numero_socios'],
                 'cliente_id' => $cliente->id,
+                'nombre_empresa' => $data['nombre_empresa'],
             ]);
 
             // Crea los posibles nombres
@@ -68,6 +70,14 @@ class FormController extends Controller
                 'posible_nombre3' => $data['posible_nombre3'],
                 'posible_nombre4' => $data['posible_nombre4'],
                 'empresa_id' => $empresa->id,
+            ]);
+
+
+            $tramite = Tramite::create([
+                'estado' => 'pendiente',
+                'cliente_id' => $cliente->id,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addDays(30),
             ]);
 
             // Crear usuario en Firebase
@@ -99,30 +109,36 @@ class FormController extends Controller
     }
 
     public function pagosPreform(PagosRequest $request){
-        $data = $request->validate();
+        $data = $request->validated(); 
 
         // Verificar si el DNI ya está registrado
-        if (Cliente::where('dni', $data['dni'])->exists()) {
-            // Se verifica que el dni ya esté registrado
-            $cliente = Cliente::where('dni', $data['dni'])->first();
+        $cliente = Cliente::where('dni', $data['dni'])->first();
 
-            //Se registra el pago
+        if ($cliente) {
+            // Obtener el trámite más reciente del cliente
+            $tramite = Tramite::where('cliente_id', $cliente->id)->latest()->first();
+
+            if (!$tramite) {
+                return response()->json(['error' => 'No se encontró un trámite para el cliente.'], 404);
+            }
+
+            // Registrar el pago
             $pago = Pago::create([
-                'cliente_id' => $cliente->id,
+                'estado' => $data['estado'],
                 'monto' => $data['monto'],
-                'fecha_pago' => now(),
-                'estado' => 'pendiente',
-            ]);
-
-            $reservaNombre = Documento::create([
-                'tipo_documento' => $data['tipo_pago'],
-                'pago_id' => $pago->id,
+                'fecha' => now(),
+                'comprobante' => $request->hasFile('comprobante') ? $request->file('comprobante')->store('pagos') : null,
+                'tipo_pago' => $data['tipo_pago'],
+                'tramite_id' => $tramite->id,
             ]);
 
             return response()->json([
                 'message' => 'Pago registrado correctamente.'
             ]);
         }
+
+        return response()->json(['error' => 'Cliente no encontrado.'], 404);
     }
+
 
 }

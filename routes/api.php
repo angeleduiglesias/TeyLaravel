@@ -18,6 +18,8 @@ Route::post('/login', [AuthController::class, 'login']);
 // Ruta para el preform.
 Route::post('/pre-form', [FormController::class, 'store']);
 
+Route::post('/cliente/pagos', [FormController::class, 'pagosPreform']);
+
 
 // Rutas protegidas por autenticación.
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -65,7 +67,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/clientes', [AdminController::class, 'clientes']);
     Route::get('/admin/notarios', [AdminController::class, 'notarios']);
 
-    Route::post('/cliente/pagos', [FormController::class, 'pagosPreform']);
+    
 
 
     // Ruta para cerrar sesión.
