@@ -155,7 +155,7 @@ class AdminController extends Controller
             return response()->json(['message' => 'No tienes permisos'], 403);
         }
 
-        
+        $nombre_cliente = Cliente::where()
 
         return response()->json();
     }
