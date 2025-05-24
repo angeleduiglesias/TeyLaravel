@@ -164,7 +164,7 @@ class AdminController extends Controller
     /**
      * Funcion para enviar todos los datos del Notario.
      */
-    public function notario()
+    public function notarios()
     {
         $user = auth()->user();
 
