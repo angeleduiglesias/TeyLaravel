@@ -141,4 +141,22 @@ class NotarioController extends Controller
         // Enviar una respuesta confirmando la eliminación.
         return response()->json(['message' => 'Notario eliminado correctamente'], 200);
     }
+
+    public function crearCita(CitaRequest $request, string $id){
+        $user = auth()->user();
+
+        // creamos una cita para el cliente y que sera notificado por medio de correo 
+        $cita =  Cita::create([
+            'cliente_id' => $user->cliente->id,
+            'titulo' => $data['titulo'], // Título de la cita
+            'descripcion' => $data['descripcion'], // Hora actual
+            'fecha' => $data['fecha'], // Fecha de la cita
+            'hora' => $data['hora'], // Hora de la cita
+        ]);
+        // Enviar una respuesta confirmando la creación de la cita.
+        return response()->json([
+            'message' => 'Cita creada correctamente',
+            'cita' => $cita
+        ], 201);
+    }
 }

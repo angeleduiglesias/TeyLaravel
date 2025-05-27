@@ -19,12 +19,12 @@ class Notario extends Model
     public function user(): BelongsTo
     {
         // Indicamos que este Cliente pertenece a un User
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function documento(): HasMany
     {
         // Indicamos que este Notario tiene muchos Documentos
-        return $this->hasMany(Documento::class);
+        return $this->hasMany(Documento::class, 'notario_id', 'id');
     }
 }

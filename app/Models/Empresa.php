@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Empresa extends Model
 {
@@ -21,6 +22,11 @@ class Empresa extends Model
     public function cliente(): BelongsTo
     {
         // Indicamos que una Empresa pertenece a un Cliente
-        return $this->belongsto(Cliente::class, 'cliente_id');
+        return $this->belongsto(Cliente::class, 'cliente_id', 'id');
+    }
+
+    public function posiblesNombres(): HasOne
+    {
+        return $this->hasOne(PosiblesNombres::class, 'empresa_id', 'id');
     }
 }

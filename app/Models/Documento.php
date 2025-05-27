@@ -25,7 +25,7 @@ class Documento extends Model
     public function notario()
     {
         // Indicamos que varios documentos pueden pertenecer a un notario
-        return $this->belongsTo(Notario::class, 'notario_id');
+        return $this->belongsTo(Notario::class, 'notario_id', 'id');
     }
 
 

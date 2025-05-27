@@ -21,6 +21,6 @@ class Pago extends Model
     public function tramite(): BelongsTo
     {
         //Indicamos que varios pagos pertenecen a un tramite
-        return $this->belongsTo(Tramite::class, 'tramite_id');
+        return $this->belongsTo(Tramite::class, 'tramite_id', 'id');
     }
 }

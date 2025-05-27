@@ -24,12 +24,12 @@ class Tramite extends Model
     public function Documento(): HasMany
     {
         // Indicamos que un tramite tiene muchos documentos
-        return $this->hasMany(Documento::class, 'tramite_id');
+        return $this->hasMany(Documento::class, 'tramite_id', 'id');
     }
 
     public function pagos(): HasMany
     {
         // Indicamos que un tramite tiene muchos pagos
-        return $this->hasMany(Pago::class, 'tramite_id');
+        return $this->hasMany(Pago::class, 'tramite_id', 'id');
     }
 }

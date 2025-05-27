@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\PosiblesNombres;
 use App\Http\Requests\Admin\CambioNombreEmpresaRequest;
 
+
 class AdminController extends Controller
 {
     /**
@@ -46,6 +47,7 @@ class AdminController extends Controller
         $tramites_recientes = $documentos->map(function ($doc) {
             $cliente = $doc->tramite->cliente ?? null;
             return [
+                'cliente_id' => $cliente?->id ?? null, 
                 'tipo_documento' => $doc->tipo_documento,
                 'nombre_cliente' => $cliente ? $cliente->nombre . ' ' . $cliente->apellidos : 'Sin nombre',
                 'fecha_tramite' => $doc->tramite->fecha_inicio ?? null,
@@ -71,31 +73,26 @@ class AdminController extends Controller
         });
 
         //Nombre del cliente con el nombre de la empresa
-        $clientes = Cliente::with('empresa')->get();
-        $nombre_empresa = $clientes->map(function ($cliente) {
-            return [
+        $clientes = Cliente::with('empresa.posiblesNombres')->get();
+
+        $reserva_nombre = [];
+
+        foreach ($clientes as $cliente) {
+            $empresa = $cliente->empresa;
+            $posibles = $empresa?->posiblesNombres;
+
+            $reserva_nombre[] = [
+                'cliente_id' => $cliente->id,
                 'nombre_cliente' => $cliente->nombre . ' ' . $cliente->apellidos,
-                'nombre_empresa' => $cliente->empresa ? $cliente->empresa->nombre : 'Sin empresa',
-                'tipo_empresa' => $cliente->empresa ? $cliente->empresa->tipo_empresa : 'Sin tipo de empresa',
+                'nombre_empresa' => $empresa?->nombre_empresa ?? 'Sin empresa',
+                'tipo_empresa' => $empresa?->tipo_empresa ?? 'Sin tipo',
+                'posible_nombre1' => $posibles?->posible_nombre1 ?? 'Sin nombre',
+                'posible_nombre2' => $posibles?->posible_nombre2 ?? 'Sin nombre',
+                'posible_nombre3' => $posibles?->posible_nombre3 ?? 'Sin nombre',
+                'posible_nombre4' => $posibles?->posible_nombre4 ?? 'Sin nombre',
             ];
-        });
+        }
 
-        //Posibles nombres de empresa
-        $nombres_posibles = PosiblesNombres::with('empresa')->get();
-        $posibles_nombres = $nombres_posibles->map(function ($item) {
-            $empresa = $item->empresa;
-            return [
-                'posible_nombre1' => $empresa?->posible_nombre1 ?? 'Sin nombre',
-                'posible_nombre2' => $empresa?->posible_nombre2 ?? 'Sin nombre',
-                'posible_nombre3' => $empresa?->posible_nombre3 ?? 'Sin nombre',
-                'posible_nombre4' => $empresa?->posible_nombre4 ?? 'Sin nombre',
-            ];
-        });
-
-        $reserva_nombre = [
-            'posibles_nombres' => $posibles_nombres,
-            'nombre_empresa' => $nombre_empresa,
-        ];
 
         // JSON de respuesta
         return response()->json([
@@ -105,7 +102,7 @@ class AdminController extends Controller
             'tramites_pendientes' => $tramites_pendientes,
             'tramites_recientes' => $tramites_recientes,
             'pagos_recientes' => $pagos_recientes,
-            'reserva_nombre' => $reserva_nombre,
+            'reserva_nombre' => $reserva_nombre
         ]);
     }
     

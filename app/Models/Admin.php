@@ -14,7 +14,7 @@ class Admin extends Model
 
     public function user(): HasOne
     {
-        return $this->hasOne(User::class);
+        return $this->hasOne(User::class, 'admin_id', 'id');
     }
     
 }

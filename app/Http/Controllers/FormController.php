@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\Empresa;
 use App\Models\PosiblesNombres;
+use App\Models\Pago;
+use App\Requests\Form\RegistrarPago;
+use App\Models\Tramite;
+use App\Http\Requests\Form\PagosRequest;
 
 
 class FormController extends Controller
@@ -52,6 +56,7 @@ class FormController extends Controller
 
             // Crea la empresa
             $empresa = Empresa::create([
+                'nombre_empresa' => $data['nombre_empresa'],
                 'tipo_aporte' => $data['tipo_aporte'],
                 'rango_capital' => $data['rango_capital'],
                 'rubro' => $data['rubro'],
@@ -67,6 +72,13 @@ class FormController extends Controller
                 'posible_nombre3' => $data['posible_nombre3'],
                 'posible_nombre4' => $data['posible_nombre4'],
                 'empresa_id' => $empresa->id,
+            ]);
+
+            $tramite = Tramite::create([
+                'estado' => 'pendiente',
+                'cliente_id' => $cliente->id,
+                'fecha_inicio' => now(),
+                'fecha_fin' => now()->addDays(30),
             ]);
 
             // Crear usuario en Firebase
@@ -96,5 +108,47 @@ class FormController extends Controller
             ], 500);
         }
     }
+
+
+    public function pagosPreform(PagosRequest $request)
+    {
+        $data = $request->validated(); 
+
+        // Buscar cliente por DNI
+        $cliente = Cliente::where('dni', $data['dni'])->first();
+
+        if (!$cliente) {
+            return response()->json(['error' => 'Cliente no encontrado.'], 404);
+        }
+
+        // Obtener el trámite pendiente más reciente
+        $tramite = Tramite::where('cliente_id', $cliente->id)
+            ->where('estado', 'pendiente')
+            ->latest()
+            ->first();
+
+        if (!$tramite) {
+            return response()->json(['error' => 'No se encontró un trámite pendiente para el cliente.'], 404);
+        }
+
+        // Registrar el pago
+        $pago = Pago::create([
+            'estado' => $data['estado'],
+            'monto' => $data['monto'],
+            'fecha' => now(),
+            'comprobante' => $request->hasFile('comprobante') ? $request->file('comprobante')->store('pagos') : null,
+            'tipo_pago' => $data['tipo_pago'],
+            'tramite_id' => $tramite->id,
+        ]);
+
+        // Cambiar estado del trámite a "en_proceso"
+        $tramite->estado = 'en_proceso';
+        $tramite->save();
+
+        return response()->json([
+            'message' => 'Pago registrado correctamente y trámite actualizado a en_proceso.'
+        ]);
+    }
+
 
 }
