@@ -144,7 +144,7 @@ class AdminController extends Controller
     /**
      * Funcion para el cambio del nombre de empresa.
      */
-    public function cambioNombreEmpresa(CambioNombreEmpresaRequest $request ){
+    public function CambioNombreEmpresa(CambioNombreEmpresaRequest $request ){
         $user = auth()->user();
 
         if ($user->rol !== 'admin') {
@@ -160,8 +160,14 @@ class AdminController extends Controller
     /**
      * Funcion para enviar todos los datos del Notario.
      */
-    public function notario()
+    public function notarios()
     {
+        $user = auth()->user();
+
+        if ($user->rol !== 'admin') {
+            return response()->json(['message' => 'No tienes permisos'], 403);
+        }
+
         $notarios = Notario::all();
         return response()->json($notarios);
     }

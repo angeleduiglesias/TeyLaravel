@@ -16,6 +16,8 @@ use App\Models\Pago;
 use App\Requests\Form\RegistrarPago;
 use App\Models\Tramite;
 use App\Http\Requests\Form\PagosRequest;
+use App\Models\Documento;
+use App\Models\Notario;
 
 
 class FormController extends Controller
@@ -63,6 +65,7 @@ class FormController extends Controller
                 'actividades' => $data['actividades'],
                 'numero_socios' => $data['numero_socios'],
                 'cliente_id' => $cliente->id,
+                'nombre_empresa' => $data['nombre_empresa'],
             ]);
 
             // Crea los posibles nombres
