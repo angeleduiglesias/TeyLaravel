@@ -119,16 +119,15 @@ class AdminController extends Controller
         }
 
         $clientes = Cliente::with([
-            'empresa:id,cliente_id,tipo_empresa',
+            'empresa:id,cliente_id,tipo_empresa,nombre_empresa',
             'tramite.pagos',
             'user:id,email'
         ])->get();
 
         $data = $clientes->map(function ($cliente) {
-            $pagoEstado = $cliente->tramite?->pagos?->last()?->estado ?? 'Sin pagos';
-
-            // Evaluar progreso en número
             $estadoTramite = optional($cliente->tramite)->estado;
+
+            // Valor numérico del progreso según el estado del trámite
             $progresoNumerico = match ($estadoTramite) {
                 'pendiente' => 0,
                 'en_proceso' => 50,
@@ -136,21 +135,32 @@ class AdminController extends Controller
                 default => 0,
             };
 
+            // Obtener los pagos
+            $pagos = $cliente->tramite?->pagos ?? collect();
+
+            // Verificar el estado de los pagos por tipo
+            $pago1 = $pagos->firstWhere('tipo_pago', 'reserva_nombre')?->estado === 'pagado';
+            $pago2 = $pagos->firstWhere('tipo_pago', 'llenado_minuta')?->estado === 'pagado';
+
             return [
-                'cliente_id' => $cliente->id,
+                'id' => $cliente->id,
                 'nombre_cliente' => ($cliente->nombre ?? '') . ' ' . ($cliente->apellidos ?? ''),
                 'dni' => $cliente->dni ?? 'No registrado',
                 'tipo_empresa' => optional($cliente->empresa)->tipo_empresa ?? 'No registrada',
+                'nombre_empresa' => optional($cliente->empresa)->nombre_empresa ?? 'No registrada',
                 'progreso' => $progresoNumerico,
-                'estado' => $pagoEstado == 'pagado' ? 'Pagado' : 'Pendiente',
-                'contacto' => $cliente->telefono ?? 'No registrado',
+                'pagos' => [
+                    'pago1' => $pago1,
+                    'pago2' => $pago2,
+                ],
+                'telefono' => $cliente->telefono ?? 'No registrado',
                 'email' => $cliente->user->email ?? 'No registrado',
+                'fecha_registro' => $cliente->created_at->format('Y-m-d'),
             ];
         });
 
         return response()->json($data);
     }
-
 
 
 
