@@ -19,8 +19,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/pre-form', [FormController::class, 'store']);
 Route::post('/cliente/pagos', [FormController::class, 'pagosPreform']);
 
-Route::post('/cliente/pagos', [FormController::class, 'pagosPreform']);
-
 
 // Rutas protegidas por autenticación.
 Route::middleware(['auth:sanctum'])->group(function () {

@@ -148,6 +148,10 @@ class FormController extends Controller
         $tramite->estado = 'en_proceso';
         $tramite->save();
 
+        // Actualizar el cliente a "activo"
+        $cliente->estado = 'activo';
+        $cliente->save();
+
         return response()->json([
             'message' => 'Pago registrado correctamente y trámite actualizado a en_proceso.'
         ]);

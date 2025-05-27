@@ -125,12 +125,23 @@ class AdminController extends Controller
         ])->get();
 
         $data = $clientes->map(function ($cliente) {
-        $pagoEstado = $cliente->tramite?->pagos?->last()?->estado ?? 'Sin pagos';
+            $pagoEstado = $cliente->tramite?->pagos?->last()?->estado ?? 'Sin pagos';
+
+            // Evaluar progreso en número
+            $estadoTramite = optional($cliente->tramite)->estado;
+            $progresoNumerico = match ($estadoTramite) {
+                'pendiente' => 0,
+                'en_proceso' => 50,
+                'finalizado' => 100,
+                default => 0,
+            };
+
             return [
+                'cliente_id' => $cliente->id,
                 'nombre_cliente' => ($cliente->nombre ?? '') . ' ' . ($cliente->apellidos ?? ''),
                 'dni' => $cliente->dni ?? 'No registrado',
                 'tipo_empresa' => optional($cliente->empresa)->tipo_empresa ?? 'No registrada',
-                'progreso' => optional($cliente->tramite)->estado ?? 'No iniciado', 
+                'progreso' => $progresoNumerico,
                 'estado' => $pagoEstado == 'pagado' ? 'Pagado' : 'Pendiente',
                 'contacto' => $cliente->telefono ?? 'No registrado',
                 'email' => $cliente->user->email ?? 'No registrado',
@@ -139,6 +150,8 @@ class AdminController extends Controller
 
         return response()->json($data);
     }
+
+
 
 
     /**
@@ -153,7 +166,7 @@ class AdminController extends Controller
 
         
 
-        return response()->json($posibles_nombres);
+        // return response()->json($posibles_nombres);
     }
 
 
