@@ -149,10 +149,8 @@ class AdminController extends Controller
                 'tipo_empresa' => optional($cliente->empresa)->tipo_empresa ?? 'No registrada',
                 'nombre_empresa' => optional($cliente->empresa)->nombre_empresa ?? 'No registrada',
                 'progreso' => $progresoNumerico,
-                'pagos' => [
-                    'pago1' => $pago1,
-                    'pago2' => $pago2,
-                ],
+                'pago1' => $pago1, 
+                'pago2' => $pago2, 
                 'telefono' => $cliente->telefono ?? 'No registrado',
                 'email' => $cliente->user->email ?? 'No registrado',
                 'fecha_registro' => $cliente->created_at->format('Y-m-d'),
@@ -172,6 +170,12 @@ class AdminController extends Controller
 
         if ($user->rol !== 'admin') {
             return response()->json(['message' => 'No tienes permisos'], 403);
+        }
+
+        $empresa = Empresa::find($request->empresa_id);
+
+        if (!$empresa) {
+            return response()->json(['message' => 'Empresa no encontrada'], 404);
         }
 
         
@@ -198,16 +202,58 @@ class AdminController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function tramites()
     {
-        //
+        $user = auth()->user();
+
+        if ($user->rol !== 'admin') {
+            return response()->json(['message' => 'No tienes permisos'], 403);
+        }
+
+        $tramites = Tramite::with(['cliente.empresa', 'pagos', 'documentos'])
+            ->get()
+            ->map(function ($tramite) {
+                $nombreCliente = $tramite->cliente
+                    ? $tramite->cliente->nombre . ' ' . $tramite->cliente->apellidos
+                    : 'Sin cliente';
+
+                $nombreEmpresa = $tramite->cliente?->empresa?->nombre_empresa ?? 'Sin empresa';
+
+                // Verificar pagos por tipo
+                $pagos = $tramite->pagos ?? collect();
+
+                $pago1 = $pagos->firstWhere('tipo_pago', 'reserva_nombre')?->estado === 'pagado';
+                $pago2 = $pagos->firstWhere('tipo_pago', 'llenado_minuta')?->estado === 'pagado';
+
+                // Obtener estado directamente del trámite
+                $estadoTramite = $tramite->estado ?? 'pendiente';
+
+                return [
+                    'id' => $tramite->id,
+                    'nombre_cliente' => $nombreCliente,
+                    'fecha_inicio' => $tramite->fecha_inicio,
+                    'fecha_fin' => $tramite->fecha_fin,
+                    'estado_tramite' => $estadoTramite,
+                    'nombre_empresa' => $nombreEmpresa,
+                    'pago1' => $pago1,
+                    'pago2' => $pago2,
+                ];
+            });
+
+        return response()->json($tramites);
     }
+
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function pagos()
     {
-        //
+        $user = auth()->user();
+        
+        if ($user->rol !== 'admin') {
+            return response()->json(['message' => 'No tienes permisos'], 403);
+        }
     }
 }

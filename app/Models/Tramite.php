@@ -21,7 +21,7 @@ class Tramite extends Model
         return $this->belongsTo(Cliente::class, 'cliente_id', 'id');
     }
 
-    public function Documento(): HasMany
+    public function documentos(): HasMany
     {
         // Indicamos que un tramite tiene muchos documentos
         return $this->hasMany(Documento::class, 'tramite_id', 'id');

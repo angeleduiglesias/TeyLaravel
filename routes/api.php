@@ -65,6 +65,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
     Route::get('/admin/clientes', [AdminController::class, 'clientes']);
     Route::get('/admin/notarios', [AdminController::class, 'notarios']);
+    Route::get('/admin/tramites', [AdminController::class, 'tramites']);
 
     
 
