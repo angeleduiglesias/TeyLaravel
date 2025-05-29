@@ -251,9 +251,75 @@ class AdminController extends Controller
     public function pagos()
     {
         $user = auth()->user();
-        
+
         if ($user->rol !== 'admin') {
             return response()->json(['message' => 'No tienes permisos'], 403);
         }
+
+        $pagos = Pago::with(['tramite.cliente'])
+            ->latest()
+            ->get();
+
+        $resultado = $pagos->map(function ($pago) {
+            $cliente = $pago->tramite->cliente ?? null;
+
+            return [
+                'id' => $cliente?->id ?? null,
+                'nombre_cliente' => $cliente ? $cliente->nombre . ' ' . $cliente->apellidos : 'Sin nombre',
+                'dni' => $cliente?->dni ?? 'Sin DNI',
+                'tipo_pago' => $pago->tipo_pago,
+                'monto' => $pago->monto,
+                'fecha' => $pago->fecha,
+                'estado_pago' => $pago->estado,
+                'forma_pago' => $pago->forma_pago ?? 'Sin forma',
+            ];
+        });
+
+        return response()->json($resultado);
     }
+
+    /**
+     * Funcion para el envio de datos sobre los reportes para el panel de administrador.
+     */
+    public function reportes()
+    {
+        // Parte 1: Ingresos por día
+        $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        $ingresos = [];
+
+        foreach (range(0, 6) as $diaNum) {
+            $total = DB::table('pagos')
+                ->whereRaw('WEEKDAY(fecha) = ?', [$diaNum])
+                ->sum('monto');
+            $ingresos[] = $total;
+        }
+
+        // Parte 2: Tipos de empresa
+        $resultados = DB::table('empresas')
+            ->select('tipo_empresa', DB::raw('count(*) as cantidad'))
+            ->groupBy('tipo_empresa')
+            ->get();
+
+        $tiposLabels = [];
+        $tiposData = [];
+
+        foreach ($resultados as $r) {
+            $tiposLabels[] = $r->tipo_empresa;
+            $tiposData[] = $r->cantidad;
+        }
+
+        // Respuesta combinada
+        return response()->json([
+
+            'dias' => $dias,
+            'ingresos' => $ingresos,
+            'labels' => $tiposLabels,
+            'data' => $tiposData,
+            'total_ingresos' => array_sum($ingresos), // Suma total de ingresos por día
+        ]);
+    }
+
+
+
+
 }
