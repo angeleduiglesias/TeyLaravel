@@ -41,7 +41,7 @@ class AdminController extends Controller
         // Últimos 15 documentos con cliente y tramite
         $documentos = Documento::with(['tramite.cliente'])
             ->latest()
-            ->take(15)
+            ->take(10)
             ->get();
 
         $tramites_recientes = $documentos->map(function ($doc) {
@@ -55,10 +55,10 @@ class AdminController extends Controller
             ];
         });
 
-        // Últimos 15 pagos con cliente
+        // Últimos 10 pagos con cliente
         $pagos = Pago::with(['tramite.cliente'])
             ->latest()
-            ->take(15)
+            ->take(10)
             ->get();
 
         $pagos_recientes = $pagos->map(function ($pago) {
@@ -179,9 +179,9 @@ class AdminController extends Controller
             return response()->json(['message' => 'Empresa no encontrada'], 404);
         }
 
-        
+        $empresa->nombre_empresa[$data->nombre_empresa];
 
-        // return response()->json($posibles_nombres);
+         return response()->json($posibles_nombres);
     }
 
 
