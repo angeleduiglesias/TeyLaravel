@@ -41,7 +41,7 @@ class AdminController extends Controller
         // Últimos 15 documentos con cliente y tramite
         $documentos = Documento::with(['tramite.cliente'])
             ->latest()
-            ->take(15)
+            ->take(10)
             ->get();
 
         $tramites_recientes = $documentos->map(function ($doc) {
