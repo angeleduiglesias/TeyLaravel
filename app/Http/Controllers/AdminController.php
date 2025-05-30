@@ -21,7 +21,7 @@ class AdminController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function dashboard(Request $request)
+    public function dashboard(Request $request): JsonResponse
     {
         $user = auth()->user();
 
@@ -165,7 +165,8 @@ class AdminController extends Controller
     /**
      * Funcion para el cambio del nombre de empresa.
      */
-    public function CambioNombreEmpresa(CambioNombreEmpresaRequest $request ){
+    public function CambioNombreEmpresa(CambioNombreEmpresaRequest $request ): JsonResponse
+    {
         $user = auth()->user();
 
         if ($user->rol !== 'admin') {
@@ -202,7 +203,7 @@ class AdminController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function tramites()
+    public function tramites(): JsonResponse
     {
         $user = auth()->user();
 
@@ -248,7 +249,7 @@ class AdminController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function pagos()
+    public function pagos(): JsonResponse
     {
         $user = auth()->user();
 
@@ -281,42 +282,45 @@ class AdminController extends Controller
     /**
      * Funcion para el envio de datos sobre los reportes para el panel de administrador.
      */
-    public function reportes()
+    public function ingresosPorDiaEloquent(Request $request): JsonResponse
     {
-        // Parte 1: Ingresos por día
-        $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-        $ingresos = [];
+        try {
+            $fechaInicio = $request->get('fecha_inicio', Carbon::now()->startOfWeek());
+            $fechaFin = $request->get('fecha_fin', Carbon::now()->endOfWeek());
 
-        foreach (range(0, 6) as $diaNum) {
-            $total = DB::table('pagos')
-                ->whereRaw('WEEKDAY(fecha) = ?', [$diaNum])
-                ->sum('monto');
-            $ingresos[] = $total;
+            // Usando modelo Eloquent
+            $pagos = \App\Models\Pago::whereBetween('fecha', [$fechaInicio, $fechaFin])
+                ->where('estado', 'pagado') // Solo pagos completados
+                // ->where('tipo_pago', 'reserva_nombre') // Si quieres filtrar por tipo específico
+                ->get()
+                ->groupBy(function($pago) {
+                    return Carbon::parse($pago->fecha)->locale('es')->dayName;
+                })
+                ->map(function($group) {
+                    return $group->sum('monto');
+                });
+
+            $diasOrden = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            $ingresosPorDia = [];
+            
+            foreach ($diasOrden as $dia) {
+                $ingresosPorDia[$dia] = $pagos->get($dia, 0);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'labels' => array_keys($ingresosPorDia),
+                    'ingresos' => array_values($ingresosPorDia),
+                    'total_semanal' => array_sum($ingresosPorDia)
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener los ingresos: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Parte 2: Tipos de empresa
-        $resultados = DB::table('empresas')
-            ->select('tipo_empresa', DB::raw('count(*) as cantidad'))
-            ->groupBy('tipo_empresa')
-            ->get();
-
-        $tiposLabels = [];
-        $tiposData = [];
-
-        foreach ($resultados as $r) {
-            $tiposLabels[] = $r->tipo_empresa;
-            $tiposData[] = $r->cantidad;
-        }
-
-        // Respuesta combinada
-        return response()->json([
-
-            'dias' => $dias,
-            'ingresos' => $ingresos,
-            'labels' => $tiposLabels,
-            'data' => $tiposData,
-            'total_ingresos' => array_sum($ingresos), // Suma total de ingresos por día
-        ]);
     }
 
 

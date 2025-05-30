@@ -68,6 +68,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/tramites', [AdminController::class, 'tramites']);
     Route::get('/admin/pagos', [AdminController::class, 'pagos']);
     Route::get('/admin/reportes', [AdminController::class, 'reportes']);
+    Route::get('/admin/configuracion', [AdminController::class, 'configuracion']);
+    Route::get('/admin/store', [AdminController::class, 'store']);
 
     
 
