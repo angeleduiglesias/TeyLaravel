@@ -55,10 +55,10 @@ class AdminController extends Controller
             ];
         });
 
-        // Últimos 15 pagos con cliente
+        // Últimos 10 pagos con cliente
         $pagos = Pago::with(['tramite.cliente'])
             ->latest()
-            ->take(15)
+            ->take(10)
             ->get();
 
         $pagos_recientes = $pagos->map(function ($pago) {
