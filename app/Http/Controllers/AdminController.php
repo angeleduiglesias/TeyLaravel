@@ -178,9 +178,9 @@ class AdminController extends Controller
             return response()->json(['message' => 'Empresa no encontrada'], 404);
         }
 
-        
+        $empresa->nombre_empresa[$data->nombre_empresa];
 
-        // return response()->json($posibles_nombres);
+         return response()->json($posibles_nombres);
     }
 
 
