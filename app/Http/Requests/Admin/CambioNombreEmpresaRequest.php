@@ -23,6 +23,7 @@ class CambioNombreEmpresaRequest extends FormRequest
     public function rules(): array
     {
         return [
+'cliente_id' => 'required|string|id',
             'nombre_empresa' => 'required|string|max:255',
         ];
     }
