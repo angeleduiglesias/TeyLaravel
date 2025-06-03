@@ -20,11 +20,52 @@ class ClienteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(IndexClienteRequest $request): JsonResponse
+    public function dashboard(IndexClienteRequest $request)
     {
-        $clientes = Cliente::all();
+        $user = auth()->user();
 
-        return response()->json($clientes, 200); // Código de respuesta HTTP 200 OK
+        if ($user->rol !== 'cliente') {
+            return response()->json(['message' => 'No tienes permisos o no te encuentras registrado.'], 403);
+        }
+
+        $cliente = $user->cliente;
+
+        if (!$cliente) {
+            return response()->json(['message' => 'Cliente no encontrado.'], 404);
+        }
+
+        $tramite = $cliente->tramite;
+
+        // Progreso numérico
+        $estadoTramite = $tramite?->estado;
+        $progresoNumerico = match ($estadoTramite) {
+            'pendiente' => 0,     
+            'en_proceso' => 50,
+            'finalizado' => 100,
+            default => 0,
+        };
+
+        // Pagos
+        $pagos = $tramite?->pagos ?? collect();
+
+        // Pagos individuales
+        $reservaNombre = $pagos->firstWhere('tipo_pago', 'reserva_nombre');
+        $minuta = $pagos->firstWhere('tipo_pago', 'llenado_minuta');
+
+        // Fecha de inicio
+        $fechaInicio = $tramite?->fecha_inicio;
+
+        return response()->json([
+            'nombre_cliente' => $cliente->nombre . ' ' . $cliente->apellidos,
+            'progreso' => $progresoNumerico,
+            'estado_tramite' => $estadoTramite ?? 'sin trámite',
+            'fecha_inicio' => $fechaInicio,
+            'nombre_reserva' => 'Reserva de nombre',
+            'estado_reserva' => $reservaNombre?->estado ?? 'no pagado',
+
+            'nombre_minuta' => 'Entrega de Minuta',
+            'estado_minuta' => $minuta?->estado ?? 'no pagado',
+        ]);
     }
 
     /**
@@ -32,7 +73,7 @@ class ClienteController extends Controller
      */
     public function profile(Request $request): JsonResponse
     {
-        $user = auth()->user(); // Usuario autenticado (desde la tabla `users`)
+        $user = auth()->user(); 
         
         // Obtener cliente relacionado si usas relación con tabla clientes
         $cliente = Cliente::where('user_id', $user->id)->first();

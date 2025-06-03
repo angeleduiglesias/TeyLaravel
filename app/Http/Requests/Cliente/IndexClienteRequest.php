@@ -11,9 +11,8 @@ class IndexClienteRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // parent::authorize(); // Verifica autenticación
-        // return $this->authorizeRoles(['cliente', 'admin']); // Verifica que tenga rol adecuado
-
+        // parent::authorize();
+        // return $this->authorizeRoles(['cliente']);
         return true;
     }
 

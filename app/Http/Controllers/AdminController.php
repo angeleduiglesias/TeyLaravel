@@ -21,7 +21,7 @@ class AdminController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function dashboard(Request $request): JsonResponse
+    public function dashboard(Request $request)
     {
         $user = auth()->user();
 
@@ -165,7 +165,7 @@ class AdminController extends Controller
     /**
      * Funcion para el cambio del nombre de empresa.
      */
-    public function CambioNombreEmpresa(CambioNombreEmpresaRequest $request ): JsonResponse
+    public function CambioNombreEmpresa(CambioNombreEmpresaRequest $request )
     {
         $user = auth()->user();
 
@@ -179,9 +179,9 @@ class AdminController extends Controller
             return response()->json(['message' => 'Empresa no encontrada'], 404);
         }
 
-        $empresa->nombre_empresa[$data->nombre_empresa];
+        // $empresa->nombre_empresa[$data->nombre_empresa];
 
-         return response()->json($posibles_nombres);
+        // return response()->json($posibles_nombres);
     }
 
 
@@ -203,53 +203,53 @@ class AdminController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function tramites(): JsonResponse
-    {
-        $user = auth()->user();
+    public function tramites()
+{
+    $user = auth()->user();
 
-        if ($user->rol !== 'admin') {
-            return response()->json(['message' => 'No tienes permisos'], 403);
-        }
+    if ($user->rol !== 'admin') {
+        return response()->json(['message' => 'No tienes permisos'], 403);
+    }
 
-        $tramites = Tramite::with(['cliente.empresa', 'pagos', 'documentos'])
-            ->get()
-            ->map(function ($tramite) {
-                $nombreCliente = $tramite->cliente
-                    ? $tramite->cliente->nombre . ' ' . $tramite->cliente->apellidos
-                    : 'Sin cliente';
+    $tramites = Tramite::with(['cliente.empresa', 'documentos'])
+        ->get()
+        ->map(function ($tramite) {
+            $nombreCliente = $tramite->cliente
+                ? $tramite->cliente->nombre . ' ' . $tramite->cliente->apellidos
+                : 'Sin cliente';
 
-                $nombreEmpresa = $tramite->cliente?->empresa?->nombre_empresa ?? 'Sin empresa';
+            $nombreEmpresa = $tramite->cliente_id?->empresa?->nombre_empresa ?? 'Sin empresa';
 
-                // Verificar pagos por tipo
-                $pagos = $tramite->pagos ?? collect();
-
-                $pago1 = $pagos->firstWhere('tipo_pago', 'reserva_nombre')?->estado === 'pagado';
-                $pago2 = $pagos->firstWhere('tipo_pago', 'llenado_minuta')?->estado === 'pagado';
-
-                // Obtener estado directamente del trámite
-                $estadoTramite = $tramite->estado ?? 'pendiente';
-
+            // Aquí puedes incluir los documentos en bruto o formatearlos como quieras:
+            $documentos = $tramite->documentos->map(function ($doc) {
                 return [
-                    'id' => $tramite->id,
-                    'nombre_cliente' => $nombreCliente,
-                    'fecha_inicio' => $tramite->fecha_inicio,
-                    'fecha_fin' => $tramite->fecha_fin,
-                    'estado_tramite' => $estadoTramite,
-                    'nombre_empresa' => $nombreEmpresa,
-                    'pago1' => $pago1,
-                    'pago2' => $pago2,
+                    'id' => $doc->id,
+                    'nombre_documento' => $doc->nombre_documento, // ajusta al nombre real
+                    'url' => $doc->url, // o cualquier otro dato relevante
                 ];
             });
 
-        return response()->json($tramites);
-    }
+            return [
+                'id' => $tramite->id,
+                'nombre_cliente' => $nombreCliente,
+                'nombre_empresa' => $nombreEmpresa,
+                'fecha_inicio' => $tramite->fecha_inicio,
+                'fecha_fin' => $tramite->fecha_fin,
+                'estado_tramite' => $tramite->estado ?? 'pendiente',
+                'documentos' => $documentos,
+            ];
+        });
+
+    return response()->json($tramites);
+}
+
 
 
 
     /**
      * Remove the specified resource from storage.
      */
-    public function pagos(): JsonResponse
+    public function pagos()
     {
         $user = auth()->user();
 
@@ -282,7 +282,7 @@ class AdminController extends Controller
     /**
      * Funcion para el envio de datos sobre los reportes para el panel de administrador.
      */
-    public function ingresosPorDiaEloquent(Request $request): JsonResponse
+    public function ingresosPorDiaEloquent(Request $request)
     {
         try {
             $fechaInicio = $request->get('fecha_inicio', Carbon::now()->startOfWeek());
