@@ -25,7 +25,6 @@ class CambioNombreEmpresaRequest extends FormRequest
         return [
             'cliente_id' => 'required|string|id',
             'nombre_empresa' => 'nullable|string|max:255',
-            'estado' => 'nullable|boolean',
         ];
     }
 }

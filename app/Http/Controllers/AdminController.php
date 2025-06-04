@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\PosiblesNombres;
 use App\Http\Requests\Admin\CambioNombreEmpresaRequest;
 use App\Mail\EmpresaAprobadaMail;
+use App\Http\Requests\Admin\StoreAdminRequest;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 
 class AdminController extends Controller
@@ -166,6 +169,7 @@ class AdminController extends Controller
     /**
      * Funcion para el cambio del nombre de empresa.
      */
+
     public function CambioNombreEmpresa(CambioNombreEmpresaRequest $request )
     {
         $user = auth()->user();
@@ -175,35 +179,46 @@ class AdminController extends Controller
         }
 
         $empresa = Empresa::find($request->empresa_id);
-
         if (!$empresa) {
             return response()->json(['message' => 'Empresa no encontrada'], 404);
         }
 
-        // Buscar el cliente 
         $cliente = Cliente::find($request->cliente_id);
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
 
-        // Buscar el documento pendiente relacionado
-        $documento = Documento::whereHas('tramite', function($q) use ($cliente, $empresa) {
-                $q->where('cliente_id', $cliente->id)
-                ->where('empresa_id', $empresa->id);
-            })
+        // Buscar el tramite del cliente para esa empresa
+        $tramite = Tramite::where('cliente_id', $cliente->id)
+            ->where('empresa_id', $empresa->id)
+            ->first();
+
+        if (!$tramite) {
+            return response()->json(['message' => 'Trámite no encontrado para este cliente y empresa'], 404);
+        }
+
+        // Buscar el documento pendiente de tipo 'reserva_nombre' asociado a ese tramite
+        $documento = Documento::where('tramite_id', $tramite->id)
             ->where('estado', 'pendiente')
+            ->where('tipo_documento', 'reserva_nombre')
             ->first();
 
         if (!$documento) {
-            return response()->json(['message' => 'Documento pendiente no encontrado'], 404);
+            return response()->json(['message' => 'Documento pendiente de reserva de nombre no encontrado'], 404);
         }
 
-        // Actualizar el estado a aprobado
+        // Actualizar el nombre de la empresa
+        $empresa->nombre_empresa = $request->nombre_empresa;
+        $empresa->save();
+
+        // Actualizar el estado del documento a aprobado
         $documento->estado = 'aprobado';
-        $documento->save();// Enviar correo al cliente
+        $documento->save();
+
+        // Enviar correo al cliente
         \Mail::to($cliente->user->email)->send(new EmpresaAprobadaMail($cliente, $empresa));
 
-        return response()->json(['message' => 'Documento aprobado correctamente']);
+        return response()->json(['message' => 'Nombre de empresa actualizado, documento aprobado y correo enviado correctamente']);
     }
 
 
@@ -226,46 +241,44 @@ class AdminController extends Controller
      * Update the specified resource in storage.
      */
     public function tramites()
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    if ($user->rol !== 'admin') {
-        return response()->json(['message' => 'No tienes permisos'], 403);
-    }
+        if ($user->rol !== 'admin') {
+            return response()->json(['message' => 'No tienes permisos'], 403);
+        }
 
-    $tramites = Tramite::with(['cliente.empresa', 'documentos'])
-        ->get()
-        ->map(function ($tramite) {
-            $nombreCliente = $tramite->cliente
-                ? $tramite->cliente->nombre . ' ' . $tramite->cliente->apellidos
-                : 'Sin cliente';
+        $tramites = Tramite::with(['cliente.empresa', 'documentos'])
+            ->get()
+            ->map(function ($tramite) {
+                $nombreCliente = $tramite->cliente
+                    ? $tramite->cliente->nombre . ' ' . $tramite->cliente->apellidos
+                    : 'Sin cliente';
 
-            $nombreEmpresa = $tramite->cliente_id?->empresa?->nombre_empresa ?? 'Sin empresa';
+                $nombreEmpresa = $tramite->cliente_id?->empresa?->nombre_empresa ?? 'Sin empresa';
 
-            // Aquí puedes incluir los documentos en bruto o formatearlos como quieras:
-            $documentos = $tramite->documentos->map(function ($doc) {
+                // Aquí puedes incluir los documentos en bruto o formatearlos como quieras:
+                $documentos = $tramite->documentos->map(function ($doc) {
+                    return [
+                        'id' => $doc->id,
+                        'nombre_documento' => $doc->nombre_documento, // ajusta al nombre real
+                        'url' => $doc->url, // o cualquier otro dato relevante
+                    ];
+                });
+
                 return [
-                    'id' => $doc->id,
-                    'nombre_documento' => $doc->nombre_documento, // ajusta al nombre real
-                    'url' => $doc->url, // o cualquier otro dato relevante
+                    'id' => $tramite->id,
+                    'nombre_cliente' => $nombreCliente,
+                    'nombre_empresa' => $nombreEmpresa,
+                    'fecha_inicio' => $tramite->fecha_inicio,
+                    'fecha_fin' => $tramite->fecha_fin,
+                    'estado_tramite' => $tramite->estado ?? 'pendiente',
+                    'documentos' => $documentos,
                 ];
             });
 
-            return [
-                'id' => $tramite->id,
-                'nombre_cliente' => $nombreCliente,
-                'nombre_empresa' => $nombreEmpresa,
-                'fecha_inicio' => $tramite->fecha_inicio,
-                'fecha_fin' => $tramite->fecha_fin,
-                'estado_tramite' => $tramite->estado ?? 'pendiente',
-                'documentos' => $documentos,
-            ];
-        });
-
-    return response()->json($tramites);
-}
-
-
+        return response()->json($tramites);
+    }
 
 
     /**
@@ -301,10 +314,11 @@ class AdminController extends Controller
         return response()->json($resultado);
     }
 
+
     /**
      * Funcion para el envio de datos sobre los reportes para el panel de administrador.
      */
-    public function ingresosPorDiaEloquent(Request $request)
+    public function ingresosPorDiaEloquent(StoreAdminRequest $request)
     {
         try {
             $fechaInicio = $request->get('fecha_inicio', Carbon::now()->startOfWeek());
@@ -345,7 +359,35 @@ class AdminController extends Controller
         }
     }
 
+    public function configuracion()
+    {
+        $user = auth()->user();
 
+        if ($user->rol !== 'admin') {
+            return response()->json(['message' => 'No tienes permisos'], 403);
+        }
+
+        $data = $request->validated();
+
+        $user = User::create([
+            'email' => $data['email'],
+            'password' => Hash::make('DitechPeru2025'),
+            'rol' => 'admin',
+            'remember_token' => Str::random(60),
+        ]);
+
+        $admin = Admin::create([
+            'nombres' => $data['nombres'],
+            'apellidos' => $data['apellidos'],
+            'telefono' => $data['telefono'],
+            'user_id' => $user->id,
+            'remember_token' => Str::random(60),
+        ]);
+
+        return response()->json([
+            'message' => 'Administrador creado exitosamente',
+        ], 201);
+    }
 
 
 }

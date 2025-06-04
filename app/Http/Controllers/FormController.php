@@ -84,21 +84,6 @@ class FormController extends Controller
                 'fecha_fin' => now()->addDays(30),
             ]);
 
-            // Crear usuario en Firebase
-            try {
-                $firebaseUser = $firebaseAuth->createUser($data['email'], 'DitechPeru2025');
-            } catch (\Exception $e) {
-                return response()->json(['error' => $e->getMessage()], 422);
-            }
-
-            // Enviar email de restablecimiento de contraseña
-            try {
-                $firebaseAuth->sendPasswordResetEmail($user->email);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'error' => 'Cliente creado, pero no se pudo enviar el correo de restablecimiento.'
-                ], 422);
-            }
 
             return response()->json(['message' => 'Formulario guardado correctamente.']);
 
@@ -113,7 +98,7 @@ class FormController extends Controller
     }
 
 
-    public function pagosPreform(PagosRequest $request)
+    public function pagosPreform(PagosRequest $request, FirebaseAuthService $firebaseAuth)
     {
         $data = $request->validated(); 
 
@@ -152,8 +137,24 @@ class FormController extends Controller
         $cliente->estado = 'activo';
         $cliente->save();
 
+        // Crear usuario en Firebase
+        try {
+            $firebaseUser = $firebaseAuth->createUser($cliente->user->email, 'DitechPeru2025');
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+
+        // Enviar email de restablecimiento de contraseña
+        try {
+            $firebaseAuth->sendPasswordResetEmail($cliente->user->email);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Cliente creado, pero no se pudo enviar el correo de restablecimiento.'
+            ], 422);
+        }
+
         return response()->json([
-            'message' => 'Pago registrado correctamente y trámite actualizado a en_proceso.'
+            'message' => 'Pago registrado correctamente.'
         ]);
     }
 

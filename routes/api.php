@@ -18,24 +18,16 @@ Route::post('/login', [AuthController::class, 'login']);
 // Ruta para el preform.
 Route::post('/pre-form', [FormController::class, 'store']);
 Route::post('/cliente/pagos', [FormController::class, 'pagosPreform']);
-Route::get('/cliente/dashboard', [ClienteController::class, 'dashboard']);
-
 
 // Rutas protegidas por autenticación.
 Route::middleware(['auth:sanctum'])->group(function () {
 
     // Rutas protegidas para el cliente.
+    Route::get('/cliente/dashboard', [ClienteController::class, 'dashboard']);
     Route::get('/cliente/{id}', [ClienteController::class, 'show']);
     Route::put('/cliente/{id}', [ClienteController::class, 'update']);
     Route::delete('/cliente/{id}', [ClienteController::class, 'destroy']);
     Route::post('/cliente/minuta', [ClienteController::class, 'minuta']);
-
-    // Rutas protegidas para el documento.
-    Route::get('/documento', [DocumentoController::class, 'index']);
-    Route::get('/documento/{id}', [DocumentoController::class, 'show']);
-    Route::put('/documento/{id}', [DocumentoController::class, 'update']);
-    Route::delete('/documento/{id}', [DocumentoController::class, 'destroy']);
-    Route::post('/documento/store', [DocumentoController::class, 'store']);
 
     // Rutas protegidas para el notario.
     Route::get('/notario', [NotarioController::class, 'index']);
@@ -54,6 +46,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/reportes', [AdminController::class, 'reportes']);
     Route::get('/admin/configuracion', [AdminController::class, 'configuracion']);
     Route::get('/admin/store', [AdminController::class, 'store']);
+
+    // Agregar y actualizar administradores.
+    Route::post('/admin/administradores', [AdminController::class, 'storeAdmin']);
+    
 
     
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Cliente;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class IndexClienteRequest extends FormRequest
+class StoreAdminRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -12,7 +12,7 @@ class IndexClienteRequest extends FormRequest
     public function authorize(): bool
     {
         parent::authorize();
-        return $this->authorizeRoles(['cliente']);
+        return $this->authorizeRoles(['admin']);
     }
 
     /**
@@ -23,7 +23,9 @@ class IndexClienteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'telefono' => 'nullable|string|max:9',
         ];
     }
 }
