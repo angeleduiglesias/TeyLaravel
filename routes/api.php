@@ -25,10 +25,10 @@ Route::get('/cliente/dashboard', [ClienteController::class, 'dashboard']);
 Route::middleware(['auth:sanctum'])->group(function () {
 
     // Rutas protegidas para el cliente.
-    
     Route::get('/cliente/{id}', [ClienteController::class, 'show']);
     Route::put('/cliente/{id}', [ClienteController::class, 'update']);
     Route::delete('/cliente/{id}', [ClienteController::class, 'destroy']);
+    Route::post('/cliente/minuta', [ClienteController::class, 'minuta']);
 
     // Rutas protegidas para el documento.
     Route::get('/documento', [DocumentoController::class, 'index']);
@@ -46,6 +46,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Rutas protegidas para el admin.
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+    Route::put('/admin/cambiarNombre', [AdminController::class, 'CambioNombreEmpresa']);
     Route::get('/admin/clientes', [AdminController::class, 'clientes']);
     Route::get('/admin/notarios', [AdminController::class, 'notarios']);
     Route::get('/admin/tramites', [AdminController::class, 'tramites']);

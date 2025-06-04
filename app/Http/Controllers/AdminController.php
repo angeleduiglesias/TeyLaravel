@@ -14,6 +14,7 @@ use App\Models\Admin;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PosiblesNombres;
 use App\Http\Requests\Admin\CambioNombreEmpresaRequest;
+use App\Mail\EmpresaAprobadaMail;
 
 
 class AdminController extends Controller
@@ -179,9 +180,30 @@ class AdminController extends Controller
             return response()->json(['message' => 'Empresa no encontrada'], 404);
         }
 
-        // $empresa->nombre_empresa[$data->nombre_empresa];
+        // Buscar el cliente 
+        $cliente = Cliente::find($request->cliente_id);
+        if (!$cliente) {
+            return response()->json(['message' => 'Cliente no encontrado'], 404);
+        }
 
-        // return response()->json($posibles_nombres);
+        // Buscar el documento pendiente relacionado
+        $documento = Documento::whereHas('tramite', function($q) use ($cliente, $empresa) {
+                $q->where('cliente_id', $cliente->id)
+                ->where('empresa_id', $empresa->id);
+            })
+            ->where('estado', 'pendiente')
+            ->first();
+
+        if (!$documento) {
+            return response()->json(['message' => 'Documento pendiente no encontrado'], 404);
+        }
+
+        // Actualizar el estado a aprobado
+        $documento->estado = 'aprobado';
+        $documento->save();// Enviar correo al cliente
+        \Mail::to($cliente->user->email)->send(new EmpresaAprobadaMail($cliente, $empresa));
+
+        return response()->json(['message' => 'Documento aprobado correctamente']);
     }
 
 
