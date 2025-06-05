@@ -178,15 +178,11 @@ class AdminController extends Controller
             return response()->json(['message' => 'No tienes permisos'], 403);
         }
 
-        $empresa = Empresa::find($request->empresa_id);
-        if (!$empresa) {
-            return response()->json(['message' => 'Empresa no encontrada'], 404);
-        }
-
         $cliente = Cliente::find($request->cliente_id);
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
+        $empresa = $cliente->empresa;
 
         // Buscar el tramite del cliente para esa empresa
         $tramite = Tramite::where('cliente_id', $cliente->id)
