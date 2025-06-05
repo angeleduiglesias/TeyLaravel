@@ -3,8 +3,9 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Base\AuthenticatedFormRequest;
 
-class CambioNombreEmpresaRequest extends FormRequest
+class CambioNombreEmpresaRequest extends AuthenticatedFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +24,7 @@ class CambioNombreEmpresaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cliente_id' => 'required|string|id',
+            'cliente_id' => 'required|exists:clientes,id',
             'nombre_empresa' => 'nullable|string|max:255',
         ];
     }

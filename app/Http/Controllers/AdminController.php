@@ -170,7 +170,7 @@ class AdminController extends Controller
      * Funcion para el cambio del nombre de empresa.
      */
 
-    public function CambioNombreEmpresa(CambioNombreEmpresaRequest $request )
+    public function CambioNombreEmpresa(CambioNombreEmpresaRequest $request)
     {
         $user = auth()->user();
 
@@ -182,15 +182,15 @@ class AdminController extends Controller
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
+
         $empresa = $cliente->empresa;
+        if (!$empresa) {
+            return response()->json(['message' => 'Empresa no encontrada para este cliente'], 404);
+        }
 
-        // Buscar el tramite del cliente para esa empresa
-        $tramite = Tramite::where('cliente_id', $cliente->id)
-            ->where('empresa_id', $empresa->id)
-            ->first();
-
+        $tramite = $cliente->tramite;
         if (!$tramite) {
-            return response()->json(['message' => 'Trámite no encontrado para este cliente y empresa'], 404);
+            return response()->json(['message' => 'Trámite no encontrado para este cliente'], 404);
         }
 
         // Buscar el documento pendiente de tipo 'reserva_nombre' asociado a ese tramite
@@ -216,6 +216,7 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Nombre de empresa actualizado, documento aprobado y correo enviado correctamente']);
     }
+
 
 
     /**

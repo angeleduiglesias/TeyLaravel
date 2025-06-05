@@ -8,7 +8,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 abstract class AuthenticatedFormRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Determina si el usuario está autenticado.
      */
     public function authorize(): bool
     {
@@ -18,26 +18,21 @@ abstract class AuthenticatedFormRequest extends FormRequest
             ], 401));
         }
 
-        return true;
+        return true; // deja que las subclases definan roles si es necesario
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * Método auxiliar para verificar roles.
      */
-    public function rules(): array
+    protected function authorizeRoles(array $roles): bool
     {
         $user = $this->user();
 
-        // Normalizamos roles requeridos como array
-        $roles = is_array($roles) ? $roles : [$roles];
-
-        // Si el usuario tiene una relación de roles (array)
+        // Verifica si el usuario tiene una relación "roles"
         if (method_exists($user, 'roles')) {
-            $userRoles = $user->roles->pluck('name')->toArray(); // Ej. ['admin', 'notario']
+            $userRoles = $user->roles->pluck('name')->toArray();
         } else {
-            $userRoles = [$user->rol]; // Para usuarios con un solo campo 'rol'
+            $userRoles = [$user->rol];
         }
 
         if (array_intersect($roles, $userRoles)) {
