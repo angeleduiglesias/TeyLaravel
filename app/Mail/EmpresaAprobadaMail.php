@@ -19,7 +19,7 @@ class EmpresaAprobadaMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($cliente, $empresa)
     {
         $this->cliente = $cliente;
         $this->empresa = $empresa;
@@ -31,33 +31,5 @@ class EmpresaAprobadaMail extends Mailable
             ->view('emails.empresa_aprobada');
     }
 
-    /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: 'Empresa Aprobada Mail',
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'view.name',
-        );
-    }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
-    }
+    
 }

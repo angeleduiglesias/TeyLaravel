@@ -212,7 +212,7 @@ class AdminController extends Controller
         $documento->save();
 
         // Enviar correo al cliente
-        \Mail::to($cliente->user->email)->send(new EmpresaAprobadaMail($cliente, $empresa));
+        Mail::to($cliente->user->email)->send(new EmpresaAprobadaMail($cliente, $empresa));
 
         return response()->json(['message' => 'Nombre de empresa actualizado, documento aprobado y correo enviado correctamente']);
     }

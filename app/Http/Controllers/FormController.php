@@ -83,6 +83,14 @@ class FormController extends Controller
                 'fecha_inicio' => now(),
                 'fecha_fin' => now()->addDays(30),
             ]);
+            
+            $documento = Documento::create([
+                'tipo_documento' => 'reserva_nombre',
+                'estado' => 'pendiente',
+                'observaciones' => 'Sin Observaciones',
+                'tramite_id' => $tramite->id,
+                'notario_id' => Notario::first()->id, // Asignar el primer notario disponible
+            ]);
 
 
             return response()->json(['message' => 'Formulario guardado correctamente.']);
