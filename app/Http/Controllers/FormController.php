@@ -62,6 +62,7 @@ class FormController extends Controller
                 'tipo_aporte' => $data['tipo_aporte'],
                 'rango_capital' => $data['rango_capital'],
                 'rubro' => $data['rubro'],
+                'tipo_empresa' => $data['tipo_empresa'],
                 'actividades' => $data['actividades'],
                 'numero_socios' => $data['numero_socios'],
                 'cliente_id' => $cliente->id,
