@@ -131,7 +131,6 @@ class AdminController extends Controller
         $data = $clientes->map(function ($cliente) {
             $estadoTramite = optional($cliente->tramite)->estado;
 
-            // Valor numérico del progreso según el estado del trámite
             $progresoNumerico = match ($estadoTramite) {
                 'pendiente' => 0,
                 'en_proceso' => 50,
@@ -139,10 +138,8 @@ class AdminController extends Controller
                 default => 0,
             };
 
-            // Obtener los pagos
             $pagos = $cliente->tramite?->pagos ?? collect();
 
-            // Verificar el estado de los pagos por tipo
             $pago1 = $pagos->firstWhere('tipo_pago', 'reserva_nombre')?->estado === 'pagado';
             $pago2 = $pagos->firstWhere('tipo_pago', 'llenado_minuta')?->estado === 'pagado';
 
@@ -158,11 +155,13 @@ class AdminController extends Controller
                 'telefono' => $cliente->telefono ?? 'No registrado',
                 'email' => $cliente->user->email ?? 'No registrado',
                 'fecha_registro' => $cliente->created_at->format('Y-m-d'),
+                'estado' => $cliente->estado ?? 'No especificado', // ← Aquí se añade el estado
             ];
         });
 
         return response()->json($data);
     }
+
 
 
     /**
