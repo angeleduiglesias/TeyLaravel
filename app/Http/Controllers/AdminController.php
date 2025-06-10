@@ -14,12 +14,9 @@ use App\Models\Admin;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PosiblesNombres;
 use App\Http\Requests\Admin\CambioNombreEmpresaRequest;
-use App\Mail\EmpresaAprobadaMail;
 use App\Http\Requests\Admin\StoreAdminRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
 
 

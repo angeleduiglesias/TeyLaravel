@@ -22,9 +22,9 @@ class DocumentoObserver
             $cliente = $documento->tramite?->cliente;
             $email = $cliente?->user?->email;
 
-            if ($email) {
-                Mail::to($email)->send(new ReservaNombreAprobadaMail($documento));
-            }
+            // if ($email) {
+            //     Mail::to($email)->send(new ReservaNombreAprobadaMail($documento));
+            // }
         }
     }
 }
