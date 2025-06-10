@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 class Documento extends Model
 {
     protected $table = 'documentos';
@@ -26,6 +26,11 @@ class Documento extends Model
     {
         // Indicamos que varios documentos pueden pertenecer a un notario
         return $this->belongsTo(Notario::class, 'notario_id', 'id');
+    }
+
+    public function minutas(): HasOne
+    {
+        return $this->hasOne(Minuta::class, 'minuta_id', 'id');
     }
 
 

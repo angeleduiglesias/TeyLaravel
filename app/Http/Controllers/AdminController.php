@@ -168,37 +168,6 @@ class AdminController extends Controller
     }
 
 
-    public function enviarCorreoManual($destinatario, $asunto, $cuerpo)
-    {
-        $mail = new PHPMailer(true);
-
-        try {
-            $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';  // Cambia aquí
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'angeledu.igle.22@gmail.com';
-            $mail->Password   = 'pgtfxqijsohzjqvj';
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
-
-            $mail->setFrom('angeledu.igle.22@gmail.com', 'Tey');
-            $mail->addAddress($destinatario);
-
-            $mail->isHTML(true);
-            $mail->Subject = $asunto;
-            $mail->Body    = $cuerpo;
-
-            $mail->send();
-            return true;
-        } catch (Exception $e) {
-            // Podrías registrar el error o devolverlo si quieres
-            return false;
-        }
-    }
-
-
-
-
     /**
      * Funcion para el cambio del nombre de empresa.
      */
@@ -244,23 +213,9 @@ class AdminController extends Controller
         $documento->estado = 'aprobado';
         $documento->save();
 
-        // Preparar datos del correo
-        $destinatario = $cliente->user->email;  // aquí tomas el correo de tu BD
-        $asunto = 'Cambio de nombre de empresa aprobado';
-        $cuerpo = "<p>Hola, el nombre de tu empresa ha sido actualizado a <strong>{$empresa->nombre_empresa}</strong> y el documento aprobado.</p>";
-
-        // Envío
-        $envio = $this->enviarCorreoManual($destinatario, $asunto, $cuerpo);
-
-        if ($envio) {
-            return response()->json([
-                'message' => 'Nombre de empresa actualizado, documento aprobado y correo enviado correctamente'
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'Nombre de empresa actualizado, documento aprobado pero falló el envío del correo'
-            ], 500);
-        }
+        return response()->json([
+            'message' => 'Nombre de empresa actualizado y documento aprobado exitosamente'
+        ]);
     }
 
 

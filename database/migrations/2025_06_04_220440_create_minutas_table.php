@@ -28,11 +28,20 @@ return new class extends Migration
             $table->string('departamento_empresa');
             $table->string('objetivo');
             $table->integer('monto_capital');
-            $table->string('apoderado');
-            $table->string('dni_apoderado');
+            $table->string('apoderado')->nullable();
+            $table->string('dni_apoderado')->nullable();
             $table->string('ciudad');
             $table->string('fecha_registro');
             $table->enum('tipo_formulario', ['eirlbnd', 'eirlbd', 'sacbnd', 'sacbd']);
+
+            $table->unsignedBigInteger('documento_id')->nullable();
+            $table->foreign('documento_id')->references('id')->on('documentos')->onDelete('cascade');
+
+            // Relaciones con Socios y Aportes
+            $table->unsignedBigInteger('socio_id')->nullable();
+            $table->foreign('socio_id')->references('id')->on('socios')->onDelete('cascade');
+            $table->unsignedBigInteger('aporte_id')->nullable();
+            $table->foreign('aporte_id')->references('id')->on('aportes')->onDelete('cascade');
             $table->timestamps();
         });
     }
