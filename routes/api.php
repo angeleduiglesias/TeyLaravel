@@ -19,6 +19,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/pre-form', [FormController::class, 'store']);
 Route::post('/cliente/pagos', [FormController::class, 'pagosPreform']);
 
+    Route::get('/notario/dashboard', [NotarioController::class, 'index']);
+
 // Rutas protegidas por autenticación.
 Route::middleware(['auth:sanctum'])->group(function () {
 
@@ -30,7 +32,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/clitente/minuta', [MinutaController::class, 'store']);
 
     // Rutas protegidas para el notario.
-    Route::get('/notario', [NotarioController::class, 'index']);
+
     Route::get('/notario/{id}', [NotarioController::class, 'show']);
     Route::put('/notario/{id}', [NotarioController::class, 'update']);
     Route::delete('/notario/{id}', [NotarioController::class, 'destroy']);

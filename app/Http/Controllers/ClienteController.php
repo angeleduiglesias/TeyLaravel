@@ -68,7 +68,7 @@ class ClienteController extends Controller
             ],
 
             'estado_documento' => [
-                'estado_reserva' => $reservaNombre?->estado ?? 'no pagado',
+                'estado_reserva' => $tramite?->documentos()?->where('tipo_documento', 'reserva_nombre')->first()?->estado ?? 'pendiente',
                 'pago2' => isset($minuta) && $minuta->estado === 'pagado',
                 'nombre_empresa' => $empresa?->nombre_empresa ?? '',
                 'tipo_empresa' => $empresa?->tipo_empresa ?? '',

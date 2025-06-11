@@ -19,7 +19,7 @@ class NotarioController extends Controller
      */
     public function index()
     {
-        $documentos = Docuemento::all();
+        $documentos = Documento::all();
         $nombre_cliente = auth()->user()->cliente->nombre;
         $apellidos_cliente = auth()->user()->cliente->apellidos;
         return response()->json([
