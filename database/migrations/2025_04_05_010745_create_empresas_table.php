@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('rubro');
             $table->enum('tipo_empresa',['SAC', 'EIRL']);
             $table->integer('numero_socios')->nullable();
-            $table->enum('tipo_aporte',['dinero', 'bienes', 'mixto']);
+            $table->enum('tipo_aporte',['dinero', 'bienes']);
             $table->string('rango_capital');
             
             $table->unsignedBigInteger('cliente_id')->unique();

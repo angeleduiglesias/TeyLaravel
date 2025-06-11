@@ -3,16 +3,19 @@
 namespace App\Http\Requests\Cliente;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Base\AuthenticatedFormRequest;
 
-class IndexClienteRequest extends FormRequest
+
+class IndexClienteRequest extends AuthenticatedFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        parent::authorize();
-        return $this->authorizeRoles(['cliente']);
+        parent::authorize(); // Verifica autenticación
+
+        return $this->authorizeRoles(['cliente']); // Verifica que tenga rol adecuado
     }
 
     /**

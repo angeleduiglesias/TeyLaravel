@@ -55,9 +55,9 @@ class User extends Authenticatable
      */
     public function cliente(): HasOne
     {
-        // Indicamos que un usuario tiene un cliente.
-        return $this->hasOne(Cliente::class, 'cliente_id', 'id');
+        return $this->hasOne(Cliente::class, 'user_id', 'id');
     }
+
 
     public function admin(): HasOne
     {

@@ -35,43 +35,56 @@ class ClienteController extends Controller
         }
 
         $tramite = $cliente->tramite;
+        $empresa = $cliente->empresa;
 
-        // Progreso numérico
+        // Progreso del trámite
         $estadoTramite = $tramite?->estado;
         $progresoNumerico = match ($estadoTramite) {
-            'pendiente' => 0,     
+            'pendiente' => 0,
             'en_proceso' => 50,
             'finalizado' => 100,
             default => 0,
         };
 
+        $fechaInicio = $tramite?->fecha_inicio;
+
         // Pagos
         $pagos = $tramite?->pagos ?? collect();
-
-        // Pagos individuales
         $reservaNombre = $pagos->firstWhere('tipo_pago', 'reserva_nombre');
         $minuta = $pagos->firstWhere('tipo_pago', 'llenado_minuta');
 
-        // Fecha de inicio
-        $fechaInicio = $tramite?->fecha_inicio;
-
         return response()->json([
             'nombre_cliente' => $cliente->nombre . ' ' . $cliente->apellidos,
-            'progreso' => $progresoNumerico,
-            'estado_tramite' => $estadoTramite ?? 'sin trámite',
-            'fecha_inicio' => $fechaInicio,
-            'nombre_reserva' => 'Reserva de nombre',
-            'estado_reserva' => $reservaNombre?->estado ?? 'no pagado',
 
-            'nombre_minuta' => 'Entrega de Minuta',
-            'estado_minuta' => $minuta?->estado ?? 'no pagado',
+            'estado_tramite' => [
+                'fecha_inicio' => $fechaInicio,
+                'estado' => $estadoTramite ?? 'sin trámite',
+                'progreso' => $progresoNumerico
+            ],
+
+            'estado_pagos' => [
+                'pago1' => isset($reservaNombre) && $reservaNombre->estado === 'pagado',
+                'pago2' => isset($minuta) && $minuta->estado === 'pagado',
+            ],
+
+            'estado_documento' => [
+                'estado_reserva' => $reservaNombre?->estado ?? 'no pagado',
+                'pago2' => isset($minuta) && $minuta->estado === 'pagado',
+                'nombre_empresa' => $empresa?->nombre_empresa ?? '',
+                'tipo_empresa' => $empresa?->tipo_empresa ?? '',
+                'tipo_aporte' => $empresa?->tipo_aporte ?? '',
+            ],
         ]);
     }
+
+
+
+
 
     /**
      * Profile se utiliza para enviar los datos al panel identificando su id.
      */
-    public function profile(Request $request): JsonResponse
+    public function profile(Request $request)
     {
         $user = auth()->user(); 
         

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 class Documento extends Model
 {
-    protected $table = 'documentos';
+    // protected $table = 'documentos';
 
     protected $fillable = [
         'tramite_id',

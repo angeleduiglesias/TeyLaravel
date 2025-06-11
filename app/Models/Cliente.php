@@ -24,9 +24,9 @@ class Cliente extends Model
 
     public function user(): BelongsTo
     {
-        // Indicamos que un Cliente pertenece a un User
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
 
     public function empresa(): HasOne
     {

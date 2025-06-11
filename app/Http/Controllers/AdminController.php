@@ -77,26 +77,45 @@ class AdminController extends Controller
         });
 
         //Nombre del cliente con el nombre de la empresa
-        $clientes = Cliente::with('empresa.posiblesNombres')->get();
+        $clientes = Cliente::with(['empresa.posiblesNombres', 'tramite.documentos', 'tramite.pagos'])->get();
 
         $reserva_nombre = [];
 
         foreach ($clientes as $cliente) {
             $empresa = $cliente->empresa;
-            $posibles = $empresa?->posiblesNombres;
+            $tramite = $cliente->tramite;
 
-            $reserva_nombre[] = [
-                'cliente_id' => $cliente->id,
-                'nombre_cliente' => $cliente->nombre . ' ' . $cliente->apellidos,
-                'nombre_empresa' => $empresa?->nombre_empresa ?? 'Sin empresa',
-                'tipo_empresa' => $empresa?->tipo_empresa ?? 'Sin tipo',
-                'posible_nombre1' => $posibles?->posible_nombre1 ?? 'Sin nombre',
-                'posible_nombre2' => $posibles?->posible_nombre2 ?? 'Sin nombre',
-                'posible_nombre3' => $posibles?->posible_nombre3 ?? 'Sin nombre',
-                'posible_nombre4' => $posibles?->posible_nombre4 ?? 'Sin nombre',
-            ];
+            if (!$empresa || !$tramite) {
+                continue; // Si no tiene empresa o trámite, omitir
+            }
+
+            // Verifica si tiene documento "reserva_nombre" en estado "pendiente"
+            $tiene_documento_pendiente = $tramite->documentos
+                ->where('tipo_documento', 'reserva_nombre')
+                ->where('estado', 'pendiente')
+                ->isNotEmpty();
+
+            // Verifica si tiene pago "reserva_nombre" en estado "pagado"
+            $tiene_pago_pagado = $tramite->pagos
+                ->where('tipo_pago', 'reserva_nombre')
+                ->where('estado', 'pagado')
+                ->isNotEmpty();
+
+            if ($tiene_documento_pendiente && $tiene_pago_pagado) {
+                $posibles = $empresa?->posiblesNombres;
+
+                $reserva_nombre[] = [
+                    'cliente_id' => $cliente->id,
+                    'nombre_cliente' => $cliente->nombre . ' ' . $cliente->apellidos,
+                    'nombre_empresa' => $empresa?->nombre_empresa ?? 'Sin empresa',
+                    'tipo_empresa' => $empresa?->tipo_empresa ?? 'Sin tipo',
+                    'posible_nombre1' => $posibles?->posible_nombre1 ?? 'Sin nombre',
+                    'posible_nombre2' => $posibles?->posible_nombre2 ?? 'Sin nombre',
+                    'posible_nombre3' => $posibles?->posible_nombre3 ?? 'Sin nombre',
+                    'posible_nombre4' => $posibles?->posible_nombre4 ?? 'Sin nombre',
+                ];
+            }
         }
-
 
         // JSON de respuesta
         return response()->json([
