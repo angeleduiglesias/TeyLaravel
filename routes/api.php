@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/cliente/{id}', [ClienteController::class, 'update']);
     Route::delete('/cliente/{id}', [ClienteController::class, 'destroy']);
     Route::post('/cliente/minuta', [MinutaController::class, 'store']);
+    Route::post('/cliente/pagoMinuta', [MinutaController::class, 'pagos']);
 
     // Rutas protegidas para el notario.
     Route::get('/notario/dashboard', [NotarioController::class, 'index']);

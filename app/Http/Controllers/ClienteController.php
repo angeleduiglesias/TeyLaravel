@@ -53,6 +53,12 @@ class ClienteController extends Controller
         $reservaNombre = $pagos->firstWhere('tipo_pago', 'reserva_nombre');
         $minuta = $pagos->firstWhere('tipo_pago', 'llenado_minuta');
 
+        $dni_cliente = $cliente->dni ?? '';
+
+        // obtener las fechas de los pagos 1 y 2
+        $fechaPago1 = $reservaNombre?->fecha_pago ?? null;
+        $fechaPago2 = $minuta?->fecha_pago ?? null;
+
         return response()->json([
             'nombre_cliente' => $cliente->nombre . ' ' . $cliente->apellidos,
 
@@ -65,6 +71,8 @@ class ClienteController extends Controller
             'estado_pagos' => [
                 'pago1' => isset($reservaNombre) && $reservaNombre->estado === 'pagado',
                 'pago2' => isset($minuta) && $minuta->estado === 'pagado',
+                'fecha_pago1' => $reservaNombre?->fecha_pago ?? null,
+                'fecha_pago2' => $minuta?->fecha_pago ?? null,
             ],
 
             'estado_documento' => [
@@ -73,6 +81,7 @@ class ClienteController extends Controller
                 'nombre_empresa' => $empresa?->nombre_empresa ?? '',
                 'tipo_empresa' => $empresa?->tipo_empresa ?? '',
                 'tipo_aporte' => $empresa?->tipo_aporte ?? '',
+                'dni_cliente' => $dni_cliente,
             ],
         ]);
     }

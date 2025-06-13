@@ -15,34 +15,50 @@ class StoreMinutaRequest extends AuthenticatedFormRequest
     }
 
     public function rules(): array
-{
-    return [
-        'formulario.paso_1_datos_personales.nacionalidad' => 'required|string',
-        'formulario.paso_1_datos_personales.dni' => 'required|string',
-        'formulario.paso_1_datos_personales.profesion' => 'required|string',
-        'formulario.paso_1_datos_personales.estado_civil' => 'required|string',
-        'formulario.paso_1_datos_personales.direccion' => 'required|string',
-        'formulario.paso_2_datos_empresa.direccion_empresa' => 'required|string',
-        'formulario.paso_2_datos_empresa.provincia_empresa' => 'required|string',
-        'formulario.paso_2_datos_empresa.departamento_empresa' => 'required|string',
-        'formulario.paso_2_datos_empresa.objetivo' => 'required|string',
-        'formulario.paso_4_capital_y_aportes.monto_capital' => 'required|numeric|min:1',
-        'formulario.paso_4_capital_y_aportes.aportes' => 'required|array|min:1',
-        'formulario.paso_4_capital_y_aportes.aportes.*.descripcion' => 'required|string',
-        'formulario.paso_4_capital_y_aportes.aportes.*.monto' => 'required|numeric|min:0',
-        'formulario.paso_5_apoderado.apoderado' => 'nullable|string',
-        'formulario.paso_5_apoderado.dni_apoderado' => 'nullable|string',
-        'formulario.paso_6_confirmacion.ciudad' => 'required|string',
-        'formulario.paso_6_confirmacion.fecha_registro' => 'required|date',
-        'formulario.paso_3_socios' => 'nullable|array',
-        'formulario.paso_3_socios.*.nombre_socio' => 'required|string',
-        'formulario.paso_3_socios.*.nacionalidad_socio' => 'required|string',
-        'formulario.paso_3_socios.*.dni_socio' => 'required|string',
-        'formulario.paso_3_socios.*.profesion_socio' => 'required|string',
-        'formulario.paso_3_socios.*.estado_civil_socio' => 'required|string',
-        'formulario.paso_3_socios.*.aporte.descripcion' => 'nullable|string',
-        'formulario.paso_3_socios.*.aporte.monto' => 'nullable|numeric',
-    ];
-}
+    {
+        return [
+            // Paso 1: DatosPersonales
+            'formulario.paso_1.nacionalidad' => 'required|string',
+            'formulario.paso_1.profesion' => 'required|string',
+            'formulario.paso_1.estado_civil' => 'required|string',
+            'formulario.paso_1.direccion' => 'required|string',
+            'formulario.paso_1.nombre_conyuge' => 'nullable|string',
+            'formulario.paso_1.dni_conyuge' => 'nullable|string',
+
+            // Paso 2: DatosEmpresa
+            'formulario.paso_2.nombre_empresa' => 'required|string',
+            'formulario.paso_2.direccion_empresa' => 'nullable|string',
+            'formulario.paso_2.provincia_empresa' => 'required|string',
+            'formulario.paso_2.departamento_empresa' => 'required|string',
+            'formulario.paso_2.objetivo' => 'required|string',
+
+            // Paso 3: Socios
+            'formulario.paso_3' => 'nullable|array',
+            'formulario.paso_3.*.nombre_socio' => 'required|string',
+            'formulario.paso_3.*.nacionalidad_socio' => 'required|string',
+            'formulario.paso_3.*.dni_socio' => 'required|string',
+            'formulario.paso_3.*.profesion_socio' => 'required|string',
+            'formulario.paso_3.*.estado_civil_socio' => 'required|string',
+            'formulario.paso_3.*.nombre_conyuge_socio' => 'nullable|string',
+            'formulario.paso_3.*.dni_conyuge_socio' => 'nullable|string',
+            'formulario.paso_3.*.aportes' => 'required|array|min:1',
+            'formulario.paso_3..aportes..descripcion' => 'required|string',
+            'formulario.paso_3..aportes..monto' => 'required|numeric|min:0',
+
+            // Paso 4: CapitalAportes
+            'formulario.paso_4.monto_capital' => 'required|numeric|min:1',
+            'formulario.paso_4.aportes' => 'required|array|min:1',
+            'formulario.paso_4.aportes.*.descripcion' => 'required|string',
+            'formulario.paso_4.aportes.*.monto' => 'required|numeric|min:0',
+
+            // Paso 5: DatosApoderado
+            'formulario.paso_5.apoderado' => 'nullable|string',
+            'formulario.paso_5.dni_apoderado' => 'nullable|string',
+
+            // Paso 6: Confirmacion
+            'formulario.paso_6.ciudad' => 'required|string',
+            'formulario.paso_6.fecha_registro' => 'required|date',
+        ];
+    }
 
 }
