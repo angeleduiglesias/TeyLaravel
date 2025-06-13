@@ -11,6 +11,7 @@ use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\MinutaController;
 
 //Ruta para el login
 Route::post('/login', [AuthController::class, 'login']);
@@ -18,8 +19,6 @@ Route::post('/login', [AuthController::class, 'login']);
 // Ruta para el preform.
 Route::post('/pre-form', [FormController::class, 'store']);
 Route::post('/cliente/pagos', [FormController::class, 'pagosPreform']);
-
-    Route::get('/notario/dashboard', [NotarioController::class, 'index']);
 
 // Rutas protegidas por autenticación.
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -29,10 +28,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/cliente/{id}', [ClienteController::class, 'show']);
     Route::put('/cliente/{id}', [ClienteController::class, 'update']);
     Route::delete('/cliente/{id}', [ClienteController::class, 'destroy']);
-    Route::post('/clitente/minuta', [MinutaController::class, 'store']);
+    Route::post('/cliente/minuta', [MinutaController::class, 'store']);
 
     // Rutas protegidas para el notario.
-
+    Route::get('/notario/dashboard', [NotarioController::class, 'index']);
     Route::get('/notario/{id}', [NotarioController::class, 'show']);
     Route::put('/notario/{id}', [NotarioController::class, 'update']);
     Route::delete('/notario/{id}', [NotarioController::class, 'destroy']);

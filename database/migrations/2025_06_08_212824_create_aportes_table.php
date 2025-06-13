@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('descripcion');
             $table->decimal('monto', 10, 2);
 
-            $table->unsingnedBigInteger('minuta_id');
+            $table->unsignedBigInteger('minuta_id');
             $table->foreign('minuta_id')->references('id')->on('minutas')->onDelete('cascade');
             $table->timestamps();
         });

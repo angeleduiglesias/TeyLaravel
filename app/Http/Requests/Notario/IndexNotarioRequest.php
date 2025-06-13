@@ -11,11 +11,11 @@ class IndexNotarioRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // parent::authorize(); // Verifica autenticación
+        parent::authorize(); // Verifica autenticación
 
-        // return $this->authorizeRoles(['cliente']); // Verifica que tenga rol adecuado
+        return $this->authorizeRoles(['cliente']); // Verifica que tenga rol adecuado
 
-        return true;
+        // return true;
     }
 
     /**

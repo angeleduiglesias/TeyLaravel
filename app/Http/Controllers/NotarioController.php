@@ -11,13 +11,15 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Notario;
 use App\Models\Docuemento;
 use Illuminate\Support\Str;
+use App\Http\Requests\Notario\IndexNotarioRequest;
+
 
 class NotarioController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(IndexNotarioRequest $request)
     {
         $documentos = Documento::all();
         $nombre_cliente = auth()->user()->cliente->nombre;

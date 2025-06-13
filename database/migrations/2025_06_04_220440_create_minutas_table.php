@@ -37,11 +37,6 @@ return new class extends Migration
             $table->unsignedBigInteger('documento_id')->nullable();
             $table->foreign('documento_id')->references('id')->on('documentos')->onDelete('cascade');
 
-            // Relaciones con Socios y Aportes
-            $table->unsignedBigInteger('socio_id')->nullable();
-            $table->foreign('socio_id')->references('id')->on('socios')->onDelete('cascade');
-            $table->unsignedBigInteger('aporte_id')->nullable();
-            $table->foreign('aporte_id')->references('id')->on('aportes')->onDelete('cascade');
             $table->timestamps();
         });
     }
